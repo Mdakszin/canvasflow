@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { ListContainer } from "../../dashboard/_componoents/list-container";
+import { Room } from "@/components/providers/room-provider";
 
 
 interface BoardPageProps {
@@ -42,11 +43,13 @@ export default async function BoardPage({ params }: BoardPageProps) {
   }
 
   return (
-    <div className="h-full overflow-x-auto p-4">
-      <h1 className="text-2xl font-bold text-primary mb-4 px-2">
-        {board.title}
-      </h1>
-      <ListContainer boardId={params.boardId} data={board.lists} />
-    </div>
+    <Room roomId={params.boardId}>
+      <div className="h-full overflow-x-auto p-4">
+        <h1 className="text-2xl font-bold text-primary mb-4 px-2">
+          {board.title}
+        </h1>
+        <ListContainer boardId={params.boardId} data={board.lists} />
+      </div>
+    </Room>
   );
 }
