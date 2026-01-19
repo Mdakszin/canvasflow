@@ -1,6 +1,7 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import './globals.css'
+import { Toaster } from '@/components/ui/sonner'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <main className="flex-grow container mx-auto py-8">
                 {children}
               </main>
+              <Toaster position="top-center" richColors />
               <footer />
             </div>
           </ThemeProvider>

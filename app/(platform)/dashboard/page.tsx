@@ -1,7 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { PrismaClient } from "@prisma/client";
 import Link from "next/link";
-import { CreateBoardForm } from "./_componoents/create-board-form";
+import { CreateBoardForm } from "./_components/create-board-form";
 import { Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
 
 const prisma = new PrismaClient();

@@ -1,15 +1,44 @@
-import React from 'react';
-import Link from 'next/link';
+import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
+import Link from "next/link";
+import { ThemeToggle } from "../theme-toggle";
 
-const header: React.FC = () => (
-    <header style={{ padding: '1rem', background: '#f5f5f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>CanvasFlow</div>
-        <nav>
-            <Link href="/" style={{ marginRight: '1rem' }}>Home</Link>
-            <Link href="/about" style={{ marginRight: '1rem' }}>About</Link>
-            <Link href="/contact">Contact</Link>
-        </nav>
+export const Header = () => {
+  return (
+    <header className="py-3 px-4 md:px-6 border-b shadow-sm bg-background">
+      <nav className="flex items-center justify-between">
+        {/* Left Side: Logo and Branding */}
+        <div className="flex items-center gap-x-4">
+          <Link href="/dashboard" className="text-2xl font-bold text-primary hover:opacity-80 transition">
+            CanvasFlow
+          </Link>
+          {/* You can add more navigation links here, e.g., for different sections */}
+        </div>
+
+        {/* Right Side: Org Switcher, Theme Toggle, and User Profile */}
+        <div className="flex items-center gap-x-4">
+          <ThemeToggle />
+          <OrganizationSwitcher
+            hidePersonal
+            afterCreateOrganizationUrl="/dashboard"
+            afterLeaveOrganizationUrl="/dashboard"
+            afterSelectOrganizationUrl="/dashboard"
+            appearance={{
+              elements: {
+                rootBox: "flex items-center justify-center",
+                organizationSwitcherTrigger: "focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              },
+            }}
+          />
+          <UserButton
+            afterSignOutUrl="/"
+            appearance={{
+              elements: {
+                avatarBox: "h-9 w-9"
+              }
+            }}
+          />
+        </div>
+      </nav>
     </header>
-);
-
-export default header;
+  );
+};

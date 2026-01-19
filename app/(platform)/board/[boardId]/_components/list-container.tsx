@@ -1,4 +1,4 @@
-import { ListWithCards } from "../../board/[boardId]/_components/types";
+import { ListWithCards } from "./types";
 import { ListForm } from "./list-form";
 import { ListItem } from "./list-item";
 // <-- CORRECT: Import from the new types file

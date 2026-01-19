@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
-import { ListContainer } from "../../dashboard/_componoents/list-container";
+import { ListContainer } from "./_components/list-container";
 import { Room } from "@/components/providers/room-provider";
 
 

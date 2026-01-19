@@ -1,8 +1,8 @@
-import { ListItemHeader } from "../../board/[boardId]/_components/list-item-header";
+import { ListItemHeader } from "./list-item-header";
 
-import { Card, CardItem } from "../../board/[boardId]/_components/card-item";
-import { CardForm } from "../../board/[boardId]/_components/card-form";
-import { ListWithCards } from "../../board/[boardId]/_components/types";
+import { Card, CardItem } from "./card-item";
+import { CardForm } from "./card-form";
+import { ListWithCards } from "./types";
 
 interface ListItemProps {
   data: ListWithCards;
