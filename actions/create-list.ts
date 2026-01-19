@@ -1,11 +1,9 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-
-const prisma = new PrismaClient();
+import { db } from "@/lib/db";
 
 const CreateListSchema = z.object({
   title: z.string().min(1, { message: "Title cannot be empty." }),
@@ -30,10 +28,10 @@ export async function createList(prevState: State, formData: FormData): Promise<
   const { title, boardId } = validatedFields.data;
 
   try {
-    const board = await prisma.board.findUnique({ where: { id: boardId, orgId } });
+    const board = await db.board.findUnique({ where: { id: boardId, orgId } });
     if (!board) return { message: "Board not found." };
 
-    const lastList = await prisma.list.findFirst({
+    const lastList = await db.list.findFirst({
       where: { boardId },
       orderBy: { order: "desc" },
       select: { order: true },
@@ -41,7 +39,7 @@ export async function createList(prevState: State, formData: FormData): Promise<
 
     const newOrder = lastList ? lastList.order + 1 : 1;
 
-    await prisma.list.create({ data: { title, boardId, order: newOrder } });
+    await db.list.create({ data: { title, boardId, order: newOrder } });
   } catch (error) {
     return { message: "Database Error: Failed to create list." };
   }

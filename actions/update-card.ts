@@ -1,11 +1,9 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-
-const prisma = new PrismaClient();
+import { db } from "@/lib/db";
 
 // Define the schema for the form data
 const UpdateCardSchema = z.object({
@@ -46,7 +44,7 @@ export async function updateCard(formData: FormData): Promise<ReturnType> {
   let card;
   try {
     // 3. Database Mutation with Security Check
-    card = await prisma.card.update({
+    card = await db.card.update({
       where: {
         id,
         // Ensure the card's list's board belongs to the user's organization
@@ -67,7 +65,7 @@ export async function updateCard(formData: FormData): Promise<ReturnType> {
 
   // 4. Cache Revalidation
   revalidatePath(`/board/${boardId}`);
-  
+
   // 5. Return Success Data
   return { data: card };
 }

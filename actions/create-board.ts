@@ -1,11 +1,10 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-const prisma = new PrismaClient();
+import { db } from "@/lib/db";
 
 // Define the schema for our form input
 const CreateBoardSchema = z.object({
@@ -49,7 +48,7 @@ export async function createBoard(prevState: State, formData: FormData): Promise
 
   // 3. Perform the database mutation
   try {
-    await prisma.board.create({
+    await db.board.create({
       data: {
         title,
         orgId,

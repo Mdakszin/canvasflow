@@ -1,10 +1,8 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { PrismaClient } from "@prisma/client";
 import Link from "next/link";
 import { CreateBoardForm } from "./_components/create-board-form";
 import { Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
-
-const prisma = new PrismaClient();
+import { db } from "@/lib/db";
 
 export default async function DashboardPage() {
   const { orgId } = await auth();
@@ -20,10 +18,10 @@ export default async function DashboardPage() {
       </div>
     );
   }
-  
+
   // Ensure the user from Clerk exists in our local database.
   // This is an idempotent operation (safe to run multiple times).
-  await prisma.user.upsert({
+  await db.user.upsert({
     where: { id: user.id },
     update: {},
     create: {
@@ -32,7 +30,7 @@ export default async function DashboardPage() {
     }
   });
 
-  const boards = await prisma.board.findMany({
+  const boards = await db.board.findMany({
     where: { orgId },
     orderBy: { createdAt: "desc" },
   });

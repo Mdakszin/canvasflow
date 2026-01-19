@@ -1,11 +1,9 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-
-const prisma = new PrismaClient();
+import { db } from "@/lib/db";
 
 const CreateCardSchema = z.object({
   title: z.string().min(1, {
@@ -42,7 +40,7 @@ export async function createCard(prevState: State, formData: FormData): Promise<
 
   try {
     // Verify that the list exists and belongs to the user's organization
-    const list = await prisma.list.findUnique({
+    const list = await db.list.findUnique({
       where: {
         id: listId,
         board: {
@@ -56,7 +54,7 @@ export async function createCard(prevState: State, formData: FormData): Promise<
     }
 
     // Find the last card in the list to determine the new order
-    const lastCard = await prisma.card.findFirst({
+    const lastCard = await db.card.findFirst({
       where: { listId },
       orderBy: { order: "desc" },
       select: { order: true },
@@ -64,7 +62,7 @@ export async function createCard(prevState: State, formData: FormData): Promise<
 
     const newOrder = lastCard ? lastCard.order + 1 : 1;
 
-    await prisma.card.create({
+    await db.card.create({
       data: {
         title,
         listId,

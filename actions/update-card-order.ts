@@ -1,9 +1,7 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { db } from "@/lib/db";
 
 // Define the shape of the input data we expect from the client
 type Input = {
@@ -28,7 +26,7 @@ export async function updateCardOrder(items: Input[]) {
 
   // Create an array of update promises to be executed in a transaction
   const transaction = items.map((card) =>
-    prisma.card.update({
+    db.card.update({
       where: {
         id: card.id,
         // Security check: Ensure the card's list is on a board in the user's org.
@@ -48,7 +46,7 @@ export async function updateCardOrder(items: Input[]) {
 
   try {
     // Execute all the update operations as a single atomic transaction
-    await prisma.$transaction(transaction);
+    await db.$transaction(transaction);
   } catch (error) {
     console.error("Failed to reorder cards:", error);
     return { error: "Database error: Failed to reorder cards." };

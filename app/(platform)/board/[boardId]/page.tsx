@@ -1,15 +1,12 @@
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { ListContainer } from "./_components/list-container";
 import { Room } from "@/components/providers/room-provider";
-
+import { db } from "@/lib/db";
 
 interface BoardPageProps {
   params: { boardId: string };
 }
-
-const prisma = new PrismaClient();
 
 export default async function BoardPage({ params }: BoardPageProps) {
   const { orgId } = await auth();
@@ -21,7 +18,7 @@ export default async function BoardPage({ params }: BoardPageProps) {
 
   // Fetch the board and all of its nested lists and cards in a single query.
   // This is a key pattern for performance.
-  const board = await prisma.board.findUnique({
+  const board = await db.board.findUnique({
     where: {
       id: params.boardId,
       orgId, // Security: Ensures the user can only access boards in their org.
