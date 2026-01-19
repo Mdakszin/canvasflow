@@ -4,11 +4,10 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/lib/db";
-import { action } from "@/lib/create-safe-action";
 import { CreateBoardSchema } from "./schema";
+import { InputType, ReturnType } from "./types";
 
-const handler = async (getInput: { parsedInput: { title: string; image: string } }) => {
-    const { title, image } = getInput.parsedInput;
+export async function createBoard(data: InputType): Promise<ReturnType> {
     const { userId, orgId } = await auth();
 
     if (!userId || !orgId) {
@@ -17,6 +16,16 @@ const handler = async (getInput: { parsedInput: { title: string; image: string }
         };
     }
 
+    const validatedFields = CreateBoardSchema.safeParse(data);
+
+    if (!validatedFields.success) {
+        return {
+            fieldErrors: validatedFields.error.flatten().fieldErrors as ReturnType["fieldErrors"],
+        };
+    }
+
+    const { title, image } = validatedFields.data;
+
     let board;
 
     try {
@@ -24,19 +33,15 @@ const handler = async (getInput: { parsedInput: { title: string; image: string }
             data: {
                 title,
                 orgId,
-                // imageId: ... (TODO: Add unsplash image handling later)
+                // imageId can be added later when you handle images
             },
         });
     } catch (error) {
         return {
-            error: "Failed to create.",
+            error: "Failed to create board.",
         };
     }
 
-    revalidatePath(`/board/${board.id}`);
+    revalidatePath(`/organization/${orgId}`);
     return { data: board };
-};
-
-export const createBoard = action
-    .schema(CreateBoardSchema)
-    .action(handler);
+}
