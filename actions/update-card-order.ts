@@ -1,57 +1,72 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { db } from "@/lib/db";
+import { ActionState } from "@/lib/create-safe-action";
+import { Card } from "@prisma/client";
 
-// Define the shape of the input data we expect from the client
-type Input = {
-  id: string;      // ID of the card being moved
-  order: number;   // Its new order (position) in the list
-  listId: string;  // The ID of the list it now belongs to
-  boardId: string; // The board ID for revalidation and context
-};
+const UpdateCardOrderSchema = z.object({
+  items: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      order: z.number(),
+      listId: z.string(),
+      createdAt: z.date(),
+      updatedAt: z.date(),
+    })
+  ),
+  boardId: z.string(),
+});
 
-export async function updateCardOrder(items: Input[]) {
+type InputType = z.infer<typeof UpdateCardOrderSchema>;
+type ReturnType = ActionState<InputType, Card[]>;
+
+export async function updateCardOrder(data: InputType): Promise<ReturnType> {
   const { userId, orgId } = await auth();
 
   if (!userId || !orgId) {
     return { error: "Unauthorized" };
   }
 
-  // We only need the boardId from the first item since all cards are on the same board
-  const boardId = items.length > 0 ? items[0].boardId : undefined;
-  if (!boardId) {
-    return { error: "Board ID is missing." };
+  const validatedFields = UpdateCardOrderSchema.safeParse(data);
+
+  if (!validatedFields.success) {
+    return {
+      fieldErrors: validatedFields.error.flatten().fieldErrors as ReturnType["fieldErrors"],
+    };
   }
 
-  // Create an array of update promises to be executed in a transaction
-  const transaction = items.map((card) =>
-    db.card.update({
-      where: {
-        id: card.id,
-        // Security check: Ensure the card's list is on a board in the user's org.
-        // This is a crucial multi-tenancy check.
-        list: {
-          board: {
-            orgId,
-          },
-        },
-      },
-      data: {
-        order: card.order,
-        listId: card.listId, // This handles both reordering and moving between lists
-      },
-    })
-  );
+  const { items, boardId } = validatedFields.data;
+  let updatedCards;
 
   try {
-    // Execute all the update operations as a single atomic transaction
-    await db.$transaction(transaction);
+    const transaction = items.map((card) =>
+      db.card.update({
+        where: {
+          id: card.id,
+          list: {
+            board: {
+              orgId,
+            },
+          },
+        },
+        data: {
+          order: card.order,
+          listId: card.listId,
+        },
+      })
+    );
+
+    updatedCards = await db.$transaction(transaction);
   } catch (error) {
-    console.error("Failed to reorder cards:", error);
-    return { error: "Database error: Failed to reorder cards." };
+    return {
+      error: "Failed to reorder."
+    };
   }
 
-  // Again, no revalidation here. Liveblocks will handle the refresh.
-  return { data: "Cards reordered successfully." };
+  revalidatePath(`/board/${boardId}`);
+  return { data: updatedCards };
 }

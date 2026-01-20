@@ -1,35 +1,68 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { db } from "@/lib/db";
+import { ActionState } from "@/lib/create-safe-action";
+import { List } from "@prisma/client";
 
- // Adjust the path if your prisma client is elsewhere
-import { ZodError } from "zod";
-import { PrismaClient } from "@prisma/client";
-// ... (imports for auth, prisma, z, etc.)
-
-type Input = { id: string; order: number; boardId: string; }[];
-
-export async function updateListOrder(items: Input) {
-  const { userId, orgId } = await auth();
-  if (!userId || !orgId) return { error: "Unauthorized" };
-
-  // Use a transaction to update all lists in a single database call
-  const transaction = items.map((list) =>
-    PrismaClient.Lists.updated({
-      where: { id: list.id, board: { orgId } }, // Security check
-      data: { order: list.order },
+const UpdateListOrderSchema = z.object({
+  items: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      order: z.number(),
+      createdAt: z.date(),
+      updatedAt: z.date(),
     })
-  );
+  ),
+  boardId: z.string(),
+});
 
-  try {
-    await PrismaClient.$transaction(transaction);
-  } catch (error) {
-    if (error instanceof ZodError) {
-      return { error: "Validation error: Failed to reorder lists." };
-    }
-    return { error: "Database error: Failed to reorder lists." };
+type InputType = z.infer<typeof UpdateListOrderSchema>;
+type ReturnType = ActionState<InputType, List[]>;
+
+export async function updateListOrder(data: InputType): Promise<ReturnType> {
+  const { userId, orgId } = await auth();
+
+  if (!userId || !orgId) {
+    return { error: "Unauthorized" };
   }
 
-  // We don't revalidate here. Liveblocks will trigger the refresh.
-  return { data: "Success" };
+  const validatedFields = UpdateListOrderSchema.safeParse(data);
+
+  if (!validatedFields.success) {
+    return {
+      fieldErrors: validatedFields.error.flatten().fieldErrors as ReturnType["fieldErrors"],
+    };
+  }
+
+  const { items, boardId } = validatedFields.data;
+  let lists;
+
+  try {
+    const transaction = items.map((list) =>
+      db.list.update({
+        where: {
+          id: list.id,
+          board: {
+            orgId,
+          },
+        },
+        data: {
+          order: list.order,
+        },
+      })
+    );
+
+    lists = await db.$transaction(transaction);
+  } catch (error) {
+    return {
+      error: "Failed to reorder."
+    };
+  }
+
+  revalidatePath(`/board/${boardId}`);
+  return { data: lists };
 }
