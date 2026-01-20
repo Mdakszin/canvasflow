@@ -1,24 +1,34 @@
 # CanvasFlow
 
-A collaborative project management application inspired by Trello, built with modern web technologies.
+A powerful, collaborative project management application inspired by Trello, built with modern web technologies and a focus on productivity.
 
 ## Tech Stack
 
-- **Framework**: [Next.js 16](https://nextjs.org/) with App Router
+- **Framework**: [Next.js 15](https://nextjs.org/) with App Router and Server Actions
 - **Authentication**: [Clerk](https://clerk.com/) for user and organization management
 - **Database**: [PostgreSQL](https://www.postgresql.org/) with [Prisma ORM](https://www.prisma.io/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components**: [shadcn/ui](https://ui.shadcn.com/)
-- **Real-time**: [Liveblocks](https://liveblocks.io/) (planned)
+- **Drag & Drop**: [@dnd-kit](https://dndkit.com/)
 
 ## Features
 
-- 🔐 **Authentication** - Secure login with Clerk
-- 🏢 **Organizations** - Multi-tenant support with team workspaces
-- 📋 **Boards** - Create and manage project boards
-- 📝 **Lists** - Organize tasks into lists
-- 🎴 **Cards** - Create cards with descriptions
-- 🔄 **Drag & Drop** - Reorder lists and cards (planned)
+- 🔐 **Authentication** - Secure login and sign-up with Clerk
+- 🏢 **Multi-Tenancy** - Create and manage multiple organizations/workspaces
+- 📋 **Board Management** - Create, rename, and delete boards with custom backgrounds
+- 🖼️ **Unsplash Integration** - Select beautiful high-quality images for board backgrounds (or use default mock images)
+- 📝 **Task Management** - Create lists and cards with rich descriptions
+- 🔄 **Drag & Drop** - Smoothly reorder lists and cards across columns
+- 📝 **Activity Log** - Track all changes (creation, updates, deletion, moves) with a detailed audit log
+- 🎨 **Modern UI** - "Productivity & Calm" theme with glassmorphism and optimistic updates
+- ⚡ **Server Actions** - Type-safe, efficient server-side mutations using `zod` validation
+
+## Upcoming Features
+
+- 💳 **Subscriptions** - Stripe integration for Pro plans (Unlimited boards)
+- 📊 **Rate Limiting** - Usage limits for free tier users
+- 🌐 **Landing Page** - Comprehensive marketing landing page
+- 🚀 **Deployment** - Production deployment optimization
 
 ## Getting Started
 
@@ -26,7 +36,7 @@ A collaborative project management application inspired by Trello, built with mo
 
 - Node.js 18+
 - npm or yarn
-- PostgreSQL database
+- PostgreSQL database (e.g., NeonDB)
 
 ### Installation
 
@@ -42,15 +52,22 @@ A collaborative project management application inspired by Trello, built with mo
    ```
 
 3. Set up environment variables:
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Fill in your environment variables:
+   Create a `.env.local` file in the root directory and add the following:
+
    ```env
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-   CLERK_SECRET_KEY=your_clerk_secret_key
-   DATABASE_URL=your_postgresql_connection_string
+   # Clerk Auth
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+   CLERK_SECRET_KEY=sk_test_...
+   NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+   NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+   NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/select-org
+   NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/select-org
+
+   # Database
+   DATABASE_URL="postgresql://user:password@host/db?sslmode=require"
+
+   # Unsplash (Optional - for real images)
+   NEXT_PUBLIC_UNSPLASH_ACCESS_KEY=your_unsplash_access_key
    ```
 
 4. Set up the database:
@@ -61,7 +78,7 @@ A collaborative project management application inspired by Trello, built with mo
 
 5. Run the development server:
    ```bash
-   npm run dev
+   npm run dev --turbopack
    ```
 
 6. Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -72,23 +89,17 @@ A collaborative project management application inspired by Trello, built with mo
 canvasflow/
 ├── app/                    # Next.js App Router
 │   ├── (auth)/             # Authentication routes
-│   ├── (marketing)/        # Public marketing pages
+│   ├── (marketing)/        # Public marketing pages & 404
 │   └── (platform)/         # Protected application routes
 │       ├── (clerk)/        # Clerk organization selection
-│       └── (dashboard)/    # Dashboard and boards
-├── actions/                # Server actions
-├── components/             # Reusable UI components
-├── hooks/                  # Custom React hooks
-├── lib/                    # Utility functions and database client
+│       └── (dashboard)/    # Dashboard, boards, and organization layout
+├── actions/                # Server actions (Safe Action pattern)
+├── components/             # Reusable UI components (form, modals, etc.)
+├── constants/              # Static data (mock images)
+├── hooks/                  # Custom React hooks (use-action, use-card-modal)
+├── lib/                    # Utilities (db, unsplash, audit-log)
 └── prisma/                 # Database schema
 ```
-
-## Scripts
-
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
 
 ## License
 
