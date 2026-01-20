@@ -2,14 +2,16 @@ import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 
+import { MobileSidebar } from "./mobile-sidebar";
+import { Logo } from "@/components/logo";
+
 export const Navbar = () => {
     return (
         <nav className="fixed z-50 top-0 px-4 w-full h-14 border-b shadow-sm bg-white flex items-center">
-            {/* Mobile Sidebar Trigger (TODO) */}
+            <MobileSidebar />
             <div className="flex items-center gap-x-4">
                 <div className="hidden md:flex">
-                    {/* Logo would go here */}
-                    <Link href="/" className="font-bold text-lg text-slate-700">CanvasFlow</Link>
+                    <Logo />
                 </div>
                 <button className="bg-primary hover:bg-primary/90 text-white rounded-sm px-2 py-1.5 text-sm hidden md:block">
                     Create
