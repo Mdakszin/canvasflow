@@ -1,0 +1,52 @@
+actions/create-board/index.ts(9,10): error TS2305: Module '"@/lib/create-safe-action"' has no exported member 'createSafeAction'.
+actions/create-board/schema.ts(8,9): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(params?: string | { error?: string | $ZodErrorMap<$ZodIssueInvalidType<unknown>> | undefined; message?: string | undefined; } | undefined): ZodString', gave the following error.
+    Object literal may only specify known properties, and 'required_error' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidType<unknown>> | undefined; message?: string | undefined; }'.
+  Overload 2 of 2, '(params?: string | { error?: string | $ZodErrorMap<$ZodIssueInvalidType<unknown>> | undefined; message?: string | undefined; } | undefined): $ZodType<...>', gave the following error.
+    Object literal may only specify known properties, and 'required_error' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidType<unknown>> | undefined; message?: string | undefined; }'.
+actions/update-list.ts(26,31): error TS2339: Property 'list' does not exist on type 'typeof PrismaClient'.
+app-backup/(platform)/board/[boardId]/_components/card-form.tsx(19,42): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(action: (state: ReturnType) => ReturnType | Promise<ReturnType>, initialState: ReturnType, permalink?: string | undefined): [state: ...]', gave the following error.
+    Argument of type '(data: { title: string; boardId: string; listId: string; }) => Promise<ReturnType>' is not assignable to parameter of type '(state: ReturnType) => ReturnType | Promise<ReturnType>'.
+      Types of parameters 'data' and 'state' are incompatible.
+        Type 'ReturnType' is missing the following properties from type '{ title: string; boardId: string; listId: string; }': title, boardId, listId
+  Overload 2 of 2, '(action: (state: ReturnType, payload: unknown) => ReturnType | Promise<ReturnType>, initialState: ReturnType, permalink?: string | undefined): [state: ...]', gave the following error.
+    Argument of type '(data: { title: string; boardId: string; listId: string; }) => Promise<ReturnType>' is not assignable to parameter of type '(state: ReturnType, payload: unknown) => ReturnType | Promise<ReturnType>'.
+      Types of parameters 'data' and 'state' are incompatible.
+        Type 'ReturnType' is missing the following properties from type '{ title: string; boardId: string; listId: string; }': title, boardId, listId
+app-backup/(platform)/board/[boardId]/_components/card-form.tsx(23,16): error TS2551: Property 'errors' does not exist on type 'ReturnType'. Did you mean 'error'?
+app-backup/(platform)/board/[boardId]/_components/list-form.tsx(13,42): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(action: (state: ReturnType) => ReturnType | Promise<ReturnType>, initialState: ReturnType, permalink?: string | undefined): [state: ...]', gave the following error.
+    Argument of type '(data: { title: string; boardId: string; }) => Promise<ReturnType>' is not assignable to parameter of type '(state: ReturnType) => ReturnType | Promise<ReturnType>'.
+      Types of parameters 'data' and 'state' are incompatible.
+        Type 'ReturnType' is missing the following properties from type '{ title: string; boardId: string; }': title, boardId
+  Overload 2 of 2, '(action: (state: ReturnType, payload: unknown) => ReturnType | Promise<ReturnType>, initialState: ReturnType, permalink?: string | undefined): [state: ...]', gave the following error.
+    Argument of type '(data: { title: string; boardId: string; }) => Promise<ReturnType>' is not assignable to parameter of type '(state: ReturnType, payload: unknown) => ReturnType | Promise<ReturnType>'.
+      Types of parameters 'data' and 'state' are incompatible.
+        Type 'ReturnType' is missing the following properties from type '{ title: string; boardId: string; }': title, boardId
+app-backup/(platform)/board/[boardId]/_components/list-form.tsx(17,16): error TS2551: Property 'errors' does not exist on type 'ReturnType'. Did you mean 'error'?
+app-backup/(platform)/board/[boardId]/_components/list-item-header.tsx(45,21): error TS2345: Argument of type 'RefObject<HTMLFormElement | null>' is not assignable to parameter of type 'RefObject<HTMLElement> | RefObject<HTMLElement>[]'.
+  Type 'RefObject<HTMLFormElement | null>' is not assignable to type 'RefObject<HTMLElement>'.
+    Type 'HTMLFormElement | null' is not assignable to type 'HTMLElement'.
+      Type 'null' is not assignable to type 'HTMLElement'.
+app-backup/(platform)/board/[boardId]/_components/list-item-header.tsx(57,18): error TS2353: Object literal may only specify known properties, and 'title' does not exist in type 'FormData'.
+app-backup/(platform)/board/[boardId]/_components/list-item-header.tsx(81,11): error TS2322: Type '{ ref: RefObject<HTMLInputElement | null>; id: string; name: string; onBlur: () => void; defaultValue: string; className: string; }' is not assignable to type 'IntrinsicAttributes & FormInputProps & RefAttributes<HTMLInputElement>'.
+  Property 'name' does not exist on type 'IntrinsicAttributes & FormInputProps & RefAttributes<HTMLInputElement>'.
+app-backup/(platform)/board/[boardId]/_components/types.ts(2,26): error TS2307: Cannot find module '@/app/generated/prisma/wasm' or its corresponding type declarations.
+app-backup/(platform)/board/[boardId]/_components/types.ts(3,27): error TS2307: Cannot find module '@/app/generated/prisma/wasm' or its corresponding type declarations.
+app-backup/(platform)/board/[boardId]/page.tsx(4,22): error TS2307: Cannot find module '@/components/providers/room-provider' or its corresponding type declarations.
+app-backup/(platform)/dashboard/_components/create-board-form.tsx(37,26): error TS2339: Property 'title' does not exist on type 'object'.
+app-backup/layout.tsx(2,31): error TS2307: Cannot find module '@/components/providers/theme-provider' or its corresponding type declarations.
+app/(platform)/(dashboard)/board/[boardId]/_components/card-form.tsx(49,27): error TS2345: Argument of type 'RefObject<HTMLFormElement | null>' is not assignable to parameter of type 'RefObject<HTMLElement> | RefObject<HTMLElement>[]'.
+  Type 'RefObject<HTMLFormElement | null>' is not assignable to type 'RefObject<HTMLElement>'.
+    Type 'HTMLFormElement | null' is not assignable to type 'HTMLElement'.
+      Type 'null' is not assignable to type 'HTMLElement'.
+app/(platform)/(dashboard)/board/[boardId]/_components/list-form.tsx(52,23): error TS2345: Argument of type 'RefObject<HTMLFormElement | null>' is not assignable to parameter of type 'RefObject<HTMLElement> | RefObject<HTMLElement>[]'.
+  Type 'RefObject<HTMLFormElement | null>' is not assignable to type 'RefObject<HTMLElement>'.
+    Type 'HTMLFormElement | null' is not assignable to type 'HTMLElement'.
+      Type 'null' is not assignable to type 'HTMLElement'.
+app/(platform)/(dashboard)/organization/[organizationId]/_components/form-popover.tsx(41,35): error TS18046: 'data' is of type 'unknown'.
+components/modals/card-modal/description.tsx(45,23): error TS2345: Argument of type 'RefObject<HTMLFormElement | null>' is not assignable to parameter of type 'RefObject<HTMLElement> | RefObject<HTMLElement>[]'.
+  Type 'RefObject<HTMLFormElement | null>' is not assignable to type 'RefObject<HTMLElement>'.
+    Type 'HTMLFormElement | null' is not assignable to type 'HTMLElement'.
+      Type 'null' is not assignable to type 'HTMLElement'.

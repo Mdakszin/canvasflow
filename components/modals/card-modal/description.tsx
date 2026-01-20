@@ -42,7 +42,7 @@ export const Description = ({ data }: DescriptionProps) => {
     };
 
     useEventListener("keydown", onKeyDown);
-    useOnClickOutside(formRef, disableEditing);
+    useOnClickOutside(formRef as React.RefObject<HTMLElement>, disableEditing);
 
     const { execute, fieldErrors } = useAction(updateCard, {
         onSuccess: (data) => {

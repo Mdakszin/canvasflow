@@ -49,7 +49,7 @@ export const ListForm = ({ boardId }: ListFormProps) => {
     };
 
     useEventListener("keydown", onKeyDown);
-    useOnClickOutside(formRef, disableEditing);
+    useOnClickOutside(formRef as React.RefObject<HTMLElement>, disableEditing);
 
     const onSubmit = (formData: FormData) => {
         const title = formData.get("title") as string;

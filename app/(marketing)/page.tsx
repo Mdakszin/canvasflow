@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { Poppins } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Medal } from "lucide-react";
@@ -8,7 +10,15 @@ const textFont = Poppins({
     weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-export default function MarketingPage() {
+export default async function MarketingPage() {
+    const { userId, orgId } = await auth();
+
+    if (userId) {
+        if (orgId) {
+            redirect(`/organization/${orgId}`);
+        }
+        redirect("/select-org");
+    }
     return (
         <div className="flex items-center justify-center flex-col">
             <div className={cn("flex items-center justify-center flex-col", textFont.className)}>
