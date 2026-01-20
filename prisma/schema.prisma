@@ -23,6 +23,12 @@ model Board {
   id        String   @id @default(cuid())
   orgId    String
   title     String
+  imageId         String
+  imageThumbUrl   String @db.Text
+  imageFullUrl    String @db.Text
+  imageUserName   String @db.Text
+  imageLinkHTML   String @db.Text
+
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String?
   lists   List[]
@@ -48,4 +54,31 @@ model Card {
   listId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum ACTION {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+enum ENTITY_TYPE {
+  BOARD
+  LIST
+  CARD
+}
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  orgId       String
+  action      ACTION
+  entityId    String
+  entityType  ENTITY_TYPE
+  entityTitle String
+  userId      String
+  userImage   String      @db.Text
+  userName    String      @db.Text
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 }

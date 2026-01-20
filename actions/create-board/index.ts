@@ -2,12 +2,16 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import { ACTION, ENTITY_TYPE } from "@prisma/client";
 
 import { db } from "@/lib/db";
-import { CreateBoardSchema } from "./schema";
-import { InputType, ReturnType } from "./types";
+import { createAuditLog } from "@/lib/create-audit-log";
+import { createSafeAction } from "@/lib/create-safe-action";
 
-export async function createBoard(data: InputType): Promise<ReturnType> {
+import { InputType, ReturnType } from "./types";
+import { CreateBoardSchema } from "./schema";
+
+const handler = async (data: InputType): Promise<ReturnType> => {
     const { userId, orgId } = await auth();
 
     if (!userId || !orgId) {
@@ -16,15 +20,21 @@ export async function createBoard(data: InputType): Promise<ReturnType> {
         };
     }
 
-    const validatedFields = CreateBoardSchema.safeParse(data);
+    const { title, image } = data;
 
-    if (!validatedFields.success) {
+    const [
+        imageId,
+        imageThumbUrl,
+        imageFullUrl,
+        imageLinkHTML,
+        imageUserName
+    ] = image.split("|");
+
+    if (!imageId || !imageThumbUrl || !imageFullUrl || !imageUserName || !imageLinkHTML) {
         return {
-            fieldErrors: validatedFields.error.flatten().fieldErrors as ReturnType["fieldErrors"],
+            error: "Missing fields. Failed to create board."
         };
     }
-
-    const { title, image } = validatedFields.data;
 
     let board;
 
@@ -33,15 +43,28 @@ export async function createBoard(data: InputType): Promise<ReturnType> {
             data: {
                 title,
                 orgId,
-                // imageId can be added later when you handle images
+                imageId,
+                imageThumbUrl,
+                imageFullUrl,
+                imageUserName,
+                imageLinkHTML,
             },
+        });
+
+        await createAuditLog({
+            entityTitle: board.title,
+            entityId: board.id,
+            entityType: ENTITY_TYPE.BOARD,
+            action: ACTION.CREATE,
         });
     } catch (error) {
         return {
-            error: "Failed to create board.",
-        };
+            error: "Failed to create."
+        }
     }
 
-    revalidatePath(`/organization/${orgId}`);
+    revalidatePath(`/board/${board.id}`);
     return { data: board };
-}
+};
+
+export const createBoard = createSafeAction(CreateBoardSchema, handler);

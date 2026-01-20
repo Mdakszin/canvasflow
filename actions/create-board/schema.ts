@@ -1,14 +1,11 @@
 import { z } from "zod";
 
 export const CreateBoardSchema = z.object({
-    title: z.string({
-        required_error: "Title is required",
-        invalid_type_error: "Title must be a string",
-    }).min(3, {
+    title: z.string().min(3, {
         message: "Title is too short",
     }),
     image: z.string({
         required_error: "Image is required",
-        invalid_type_error: "Image must be a string",
+        invalid_type_error: "Image is required",
     }),
 });

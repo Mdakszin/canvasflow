@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { ActionState } from "@/lib/create-safe-action";
-import { Card } from "@prisma/client";
+import { Card, ENTITY_TYPE, ACTION } from "@prisma/client";
+import { createAuditLog } from "@/lib/create-audit-log";
 
 const CreateCardSchema = z.object({
   title: z.string().min(1, { message: "Title cannot be empty." }),
@@ -62,7 +63,15 @@ export async function createCard(data: InputType): Promise<ReturnType> {
         title,
         listId,
         order: newOrder,
+        description: "",
       },
+    });
+
+    await createAuditLog({
+      entityId: card.id,
+      entityTitle: card.title,
+      entityType: ENTITY_TYPE.CARD,
+      action: ACTION.CREATE,
     });
   } catch (error) {
     return { error: "Failed to create card." };

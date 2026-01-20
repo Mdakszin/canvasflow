@@ -34,7 +34,8 @@ export const BoardList = async () => {
                     <Link
                         key={board.id}
                         href={`/board/${board.id}`}
-                        className="group relative aspect-video bg-teal-600 rounded-sm h-full w-full p-2 overflow-hidden"
+                        className="group relative aspect-video bg-no-repeat bg-center bg-cover bg-teal-600 rounded-sm h-full w-full p-2 overflow-hidden"
+                        style={{ backgroundImage: `url(${board.imageThumbUrl})` }}
                     >
                         <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition" />
                         <p className="relative font-semibold text-white">
@@ -42,7 +43,17 @@ export const BoardList = async () => {
                         </p>
                     </Link>
                 ))}
-                <FormPopover />
+                <FormPopover sideOffset={10} side="right">
+                    <div
+                        role="button"
+                        className="aspect-video relative h-full w-full bg-muted rounded-sm flex flex-col gap-y-1 items-center justify-center hover:opacity-75 transition"
+                    >
+                        <p className="text-sm">Create new board</p>
+                        <span className="text-xs">
+                            5 remaining
+                        </span>
+                    </div>
+                </FormPopover>
             </div>
         </div>
     );

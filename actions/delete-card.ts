@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { ActionState } from "@/lib/create-safe-action";
-import { Card } from "@prisma/client";
+import { Card, ENTITY_TYPE, ACTION } from "@prisma/client";
+import { createAuditLog } from "@/lib/create-audit-log";
 
 const DeleteCardSchema = z.object({
     id: z.string(),
@@ -46,6 +47,13 @@ export async function deleteCard(data: InputType): Promise<ReturnType> {
                     },
                 },
             },
+        });
+
+        await createAuditLog({
+            entityId: card.id,
+            entityTitle: card.title,
+            entityType: ENTITY_TYPE.CARD,
+            action: ACTION.DELETE,
         });
     } catch (error) {
         return {

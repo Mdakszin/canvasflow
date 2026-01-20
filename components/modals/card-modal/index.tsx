@@ -7,19 +7,27 @@ import { getCard } from "@/actions/get-card";
 import { Header } from "./header";
 import { Description } from "./description";
 import { Actions } from "./actions";
+import { Activity } from "./activity";
 import { CardWithList } from "@/types";
+import { AuditLog } from "@prisma/client";
+import { getActivity } from "@/actions/get-activity";
 
 export const CardModal = () => {
     const { id, isOpen, onClose } = useCardModal();
     const [cardData, setCardData] = useState<CardWithList | null>(null);
+    const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
 
     useEffect(() => {
         if (id) {
-            const fetchCard = async () => {
-                const data = await getCard(id);
-                setCardData(data);
+            const fetchData = async () => {
+                const [cardData, auditLogs] = await Promise.all([
+                    getCard(id),
+                    getActivity(id),
+                ]);
+                setCardData(cardData);
+                setAuditLogs(auditLogs);
             };
-            fetchCard();
+            fetchData();
         } else {
             setCardData(null);
         }
@@ -39,6 +47,7 @@ export const CardModal = () => {
                             <div className="col-span-3">
                                 <div className="w-full space-y-6">
                                     <Description data={cardData} />
+                                    <Activity items={auditLogs} />
                                 </div>
                             </div>
                             <div className="col-span-1">

@@ -1,38 +1,90 @@
 "use client";
 
+import { ElementRef, useRef } from "react";
+import { toast } from "sonner";
+import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+    PopoverClose,
+} from "@/components/ui/popover";
 import { useAction } from "@/hooks/use-action";
+import { Button } from "@/components/ui/button";
 import { createBoard } from "@/actions/create-board";
 import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
-import { toast } from "sonner";
+import { FormPicker } from "@/components/form/form-picker";
 
-export const FormPopover = () => {
+interface FormPopoverProps {
+    children: React.ReactNode;
+    side?: "left" | "right" | "top" | "bottom";
+    align?: "start" | "center" | "end";
+    sideOffset?: number;
+}
+
+export const FormPopover = ({
+    children,
+    side = "bottom",
+    align,
+    sideOffset = 0,
+}: FormPopoverProps) => {
+    const router = useRouter();
+    const closeRef = useRef<ElementRef<"button">>(null);
+
     const { execute, fieldErrors } = useAction(createBoard, {
         onSuccess: (data) => {
             toast.success("Board created!");
-            // Close popover if I had one
+            closeRef.current?.click();
+            router.push(`/board/${data.id}`);
         },
         onError: (error) => {
             toast.error(error);
-        }
+        },
     });
 
     const onSubmit = (formData: FormData) => {
         const title = formData.get("title") as string;
-        const image = formData.get("image") as string || "https://images.unsplash.com/photo-1707343843437-caacff5cfa74"; // Placeholder image
+        const image = formData.get("image") as string;
 
         execute({ title, image });
-    }
+    };
 
     return (
-        <div className="relative aspect-video h-full w-full bg-muted rounded-sm flex flex-col gap-y-1 items-center justify-center hover:opacity-75 transition p-4">
-            <p className="text-sm">Create New Board</p>
-            <form action={onSubmit} className="flex flex-col gap-2 w-full">
-                <FormInput id="title" errors={fieldErrors} placeholder="Board Title" />
-                {/* Hidden image input for now */}
-                <input name="image" type="hidden" value="https://images.unsplash.com/photo-1707343843437-caacff5cfa74" />
-                <FormSubmit className="w-full">Create</FormSubmit>
-            </form>
-        </div>
+        <Popover>
+            <PopoverTrigger asChild>{children}</PopoverTrigger>
+            <PopoverContent
+                align={align}
+                className="w-80 pt-3"
+                side={side}
+                sideOffset={sideOffset}
+            >
+                <div className="text-sm font-medium text-center text-neutral-600 pb-4">
+                    Create board
+                </div>
+                <PopoverClose ref={closeRef} asChild>
+                    <Button
+                        className="h-auto w-auto p-2 absolute top-2 right-2 text-neutral-600"
+                        variant="ghost"
+                    >
+                        <X className="h-4 w-4" />
+                    </Button>
+                </PopoverClose>
+                <form action={onSubmit} className="space-y-4">
+                    <div className="space-y-4">
+                        <FormPicker id="image" errors={fieldErrors} />
+                        <FormInput
+                            id="title"
+                            label="Board title"
+                            type="text"
+                            errors={fieldErrors}
+                        />
+                    </div>
+                    <FormSubmit className="w-full">Create</FormSubmit>
+                </form>
+            </PopoverContent>
+        </Popover>
     );
 };

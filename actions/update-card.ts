@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { ActionState } from "@/lib/create-safe-action";
-import { Card } from "@prisma/client";
+import { Card, ENTITY_TYPE, ACTION } from "@prisma/client";
+import { createAuditLog } from "@/lib/create-audit-log";
 
 const UpdateCardSchema = z.object({
   boardId: z.string(),
@@ -57,6 +58,13 @@ export async function updateCard(data: InputType): Promise<ReturnType> {
       data: {
         ...values,
       },
+    });
+
+    await createAuditLog({
+      entityId: card.id,
+      entityTitle: card.title,
+      entityType: ENTITY_TYPE.CARD,
+      action: ACTION.UPDATE,
     });
   } catch (error) {
     return {
