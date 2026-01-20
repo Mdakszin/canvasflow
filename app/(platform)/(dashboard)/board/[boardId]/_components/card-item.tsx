@@ -3,6 +3,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Card } from "@prisma/client";
+import { useCardModal } from "@/hooks/use-card-modal";
 
 import { cn } from "@/lib/utils"; // Assuming utils exists
 
@@ -12,6 +13,8 @@ interface CardItemProps {
 }
 
 export const CardItem = ({ card, index }: CardItemProps) => {
+    const cardModal = useCardModal();
+
     const {
         attributes,
         listeners,
@@ -34,6 +37,7 @@ export const CardItem = ({ card, index }: CardItemProps) => {
 
     return (
         <div
+            onClick={() => cardModal.onOpen(card.id)}
             ref={setNodeRef}
             style={style}
             {...attributes}

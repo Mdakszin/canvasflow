@@ -4,50 +4,50 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { ActionState } from "@/lib/create-safe-action";
+import { Card } from "@prisma/client";
 
-// Define the schema for the form data
 const UpdateCardSchema = z.object({
-  title: z.string().min(1, {
-    message: "Title cannot be empty.",
-  }),
-  id: z.string(), // The ID of the card to update
-  boardId: z.string(), // The ID of the board for revalidation
+  boardId: z.string(),
+  description: z.optional(
+    z.string().min(3, {
+      message: "Description is too short.",
+    })
+  ),
+  title: z.optional(
+    z.string().min(1, {
+      message: "Title is too short.",
+    })
+  ),
+  id: z.string(),
 });
 
-// Define the return type for our action
-type ReturnType = {
-  data?: { id: string; title: string }; // Return only what's needed
-  error?: string;
-};
+type InputType = z.infer<typeof UpdateCardSchema>;
+type ReturnType = ActionState<InputType, Card>;
 
-export async function updateCard(formData: FormData): Promise<ReturnType> {
+export async function updateCard(data: InputType): Promise<ReturnType> {
   const { userId, orgId } = await auth();
 
-  // 1. Authentication & Authorization Check
   if (!userId || !orgId) {
     return { error: "Unauthorized" };
   }
 
-  // 2. Validation
-  const validatedFields = UpdateCardSchema.safeParse({
-    title: formData.get("title"),
-    id: formData.get("id"),
-    boardId: formData.get("boardId"),
-  });
+  const validatedFields = UpdateCardSchema.safeParse(data);
 
   if (!validatedFields.success) {
-    return { error: "Invalid fields." };
+    return {
+      fieldErrors: validatedFields.error.flatten().fieldErrors as ReturnType["fieldErrors"],
+    };
   }
 
-  const { title, id, boardId } = validatedFields.data;
+  const { id, boardId, ...values } = validatedFields.data;
 
   let card;
+
   try {
-    // 3. Database Mutation with Security Check
     card = await db.card.update({
       where: {
         id,
-        // Ensure the card's list's board belongs to the user's organization
         list: {
           board: {
             orgId,
@@ -55,17 +55,15 @@ export async function updateCard(formData: FormData): Promise<ReturnType> {
         },
       },
       data: {
-        title,
+        ...values,
       },
     });
   } catch (error) {
-    console.error("Failed to update card:", error);
-    return { error: "Failed to update card." };
+    return {
+      error: "Failed to update.",
+    };
   }
 
-  // 4. Cache Revalidation
   revalidatePath(`/board/${boardId}`);
-
-  // 5. Return Success Data
   return { data: card };
 }

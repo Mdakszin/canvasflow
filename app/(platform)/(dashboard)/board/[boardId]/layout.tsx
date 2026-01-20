@@ -56,7 +56,7 @@ export default async function BoardIdLayout({
     }
 
     return (
-        <div className="relative h-full bg-slate-200">
+        <div className="relative h-full bg-[#F0F4F8]">
             <BoardNavbar board={board} />
             <main className="relative pt-28 h-full">
                 {children}
