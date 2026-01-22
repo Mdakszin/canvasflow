@@ -31,7 +31,7 @@ export default async function MarketingPage() {
                     </div>
                     <h1 className="text-4xl md:text-7xl text-neutral-800 mb-6 font-extrabold max-w-4xl tracking-tight leading-tight">
                         CanvasFlow helps teams <br className="hidden md:block" />
-                        <span className="bg-gradient-to-r from-teal-500 via-emerald-600 to-cyan-600 text-transparent bg-clip-text">
+                        <span className="bg-linear-to-r from-teal-500 via-emerald-600 to-cyan-600 text-transparent bg-clip-text">
                             move work forward.
                         </span>
                     </h1>
