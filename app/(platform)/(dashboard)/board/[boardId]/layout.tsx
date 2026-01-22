@@ -3,6 +3,7 @@ import { redirect, notFound } from "next/navigation";
 
 import { db } from "@/lib/db";
 import { BoardNavbar } from "./_components/board-navbar";
+import { Room } from "@/components/providers/room-provider";
 
 export async function generateMetadata({
     params,
@@ -56,14 +57,17 @@ export default async function BoardIdLayout({
     }
 
     return (
-        <div
-            className="relative h-full bg-no-repeat bg-cover bg-center"
-            style={{ backgroundImage: `url(${board.imageFullUrl})` }}
-        >
-            <BoardNavbar board={board} />
-            <main className="relative pt-28 h-full">
-                {children}
-            </main>
-        </div>
+        <Room roomId={boardId}>
+            <div
+                className="relative h-full bg-no-repeat bg-cover bg-center"
+                style={{ backgroundImage: `url(${board.imageFullUrl})` }}
+            >
+                <BoardNavbar board={board} />
+                <main className="relative pt-28 h-full">
+                    {children}
+                </main>
+            </div>
+        </Room>
     );
 }
+

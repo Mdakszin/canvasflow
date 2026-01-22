@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { db } from "@/lib/db";
 import { ListContainer } from "./_components/list-container";
+import { CursorTracker } from "./_components/cursor-tracker";
 
 export default async function BoardIdPage({
     params,
@@ -36,11 +37,13 @@ export default async function BoardIdPage({
     });
 
     return (
-        <div className="p-4 h-full overflow-x-auto">
-            <ListContainer
-                boardId={boardId}
-                lists={lists}
-            />
-        </div>
+        <CursorTracker>
+            <div className="p-4 h-full overflow-x-auto">
+                <ListContainer
+                    boardId={boardId}
+                    lists={lists}
+                />
+            </div>
+        </CursorTracker>
     );
 }
