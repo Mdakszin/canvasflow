@@ -4,8 +4,9 @@ A powerful, collaborative project management application inspired by Trello, bui
 
 ## Tech Stack
 
-- **Framework**: [Next.js 15](https://nextjs.org/) with App Router and Server Actions
+- **Framework**: [Next.js 16](https://nextjs.org/) with App Router, Server Actions, and Turbopack
 - **Authentication**: [Clerk](https://clerk.com/) for user and organization management
+- **Real-Time**: [Liveblocks](https://liveblocks.io/) for collaboration, presence, and status synchronization
 - **Database**: [PostgreSQL](https://www.postgresql.org/) with [Prisma ORM](https://www.prisma.io/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components**: [shadcn/ui](https://ui.shadcn.com/)
@@ -15,13 +16,14 @@ A powerful, collaborative project management application inspired by Trello, bui
 
 - 🔐 **Authentication** - Secure login and sign-up with Clerk
 - 🏢 **Multi-Tenancy** - Create and manage multiple organizations/workspaces
+- 👥 **Real-Time Collaboration** - See live cursors and active collaborators on every board powered by Liveblocks
+- 🔄 **Real-Time Sync** - Drag-and-drop actions are synchronized instantly across all users in the room
+- 🤝 **Presence Awareness** - Visual indicators show when other users are dragging lists or cards
 - 📋 **Board Management** - Create, rename, and delete boards with custom backgrounds
-- 🖼️ **Unsplash Integration** - Select beautiful high-quality images for board backgrounds (or use default mock images)
-- 📝 **Task Management** - Create lists and cards with rich descriptions
-- 🔄 **Drag & Drop** - Smoothly reorder lists and cards across columns
-- 📝 **Activity Log** - Track all changes (creation, updates, deletion, moves) with a detailed audit log
-- 🎨 **Modern UI** - "Productivity & Calm" theme with glassmorphism and optimistic updates
-- ⚡ **Server Actions** - Type-safe, efficient server-side mutations using `zod` validation
+- 🖼️ **Unsplash Integration** - Select beautiful high-quality images for board backgrounds
+- 🔄 **Stability** - Robust drag-and-drop logic with hydration fixes and reordering persistence
+- 🎨 **Modern UI** - Dark-themed navbars, background overlays, and glassmorphism for maximum readability
+
 
 ## Upcoming Features
 
@@ -60,13 +62,14 @@ A powerful, collaborative project management application inspired by Trello, bui
    CLERK_SECRET_KEY=sk_test_...
    NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
    NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-   NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/select-org
-   NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/select-org
+
+   # Liveblocks (Real-time)
+   LIVEBLOCKS_SECRET_KEY=sk_prod_...
 
    # Database
    DATABASE_URL="postgresql://user:password@host/db?sslmode=require"
 
-   # Unsplash (Optional - for real images)
+   # Unsplash (Optional)
    NEXT_PUBLIC_UNSPLASH_ACCESS_KEY=your_unsplash_access_key
    ```
 
@@ -78,7 +81,7 @@ A powerful, collaborative project management application inspired by Trello, bui
 
 5. Run the development server:
    ```bash
-   npm run dev --turbopack
+   npm run dev
    ```
 
 6. Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -88,18 +91,21 @@ A powerful, collaborative project management application inspired by Trello, bui
 ```
 canvasflow/
 ├── app/                    # Next.js App Router
-│   ├── (auth)/             # Authentication routes
-│   ├── (marketing)/        # Public marketing pages & 404
-│   └── (platform)/         # Protected application routes
-│       ├── (clerk)/        # Clerk organization selection
-│       └── (dashboard)/    # Dashboard, boards, and organization layout
+│   ├── (platform)/         # Protected application routes
+│   │   └── (dashboard)/    # Board pages & Cursor tracking
+│   ├── api/                # API routes (Liveblocks Auth)
+│   └── layout.tsx          # Root layout with Providers
 ├── actions/                # Server actions (Safe Action pattern)
-├── components/             # Reusable UI components (form, modals, etc.)
-├── constants/              # Static data (mock images)
-├── hooks/                  # Custom React hooks (use-action, use-card-modal)
-├── lib/                    # Utilities (db, unsplash, audit-log)
-└── prisma/                 # Database schema
+├── components/             # UI & Real-time components
+│   ├── liveblocks/         # Cursors, Collaborators, etc.
+│   └── providers/          # Liveblocks & Room providers
+├── hooks/                  # use-action, use-card-modal, etc.
+├── lib/                    # Liveblocks client, DB, etc.
+├── prisma/                 # Database schema
+├── proxy.ts                # Next.js 16 Network Boundary
+└── liveblocks.config.ts    # Liveblocks type definitions
 ```
+
 
 ## License
 
