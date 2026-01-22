@@ -26,10 +26,18 @@ import { List, Card } from "@prisma/client";
 import { updateListOrder } from "@/actions/update-list-order";
 import { updateCardOrder } from "@/actions/update-card-order";
 import { useAction } from "@/hooks/use-action";
+import { useRouter } from "next/navigation";
+import {
+    useUpdateMyPresence,
+    useBroadcastEvent,
+    useEventListener,
+    useOthers
+} from "@/lib/liveblocks";
 import { ListItem } from "./list-item";
 import { ListForm } from "./list-form";
 import { CardItem } from "./card-item";
 import { toast } from "sonner";
+
 
 type ListWithCards = List & { cards: Card[] };
 
@@ -39,13 +47,24 @@ interface ListContainerProps {
 }
 
 export const ListContainer = ({ boardId, lists }: ListContainerProps) => {
+    const router = useRouter();
+    const updateMyPresence = useUpdateMyPresence();
+    const broadcast = useBroadcastEvent();
+
     const [orderedData, setOrderedData] = useState(lists);
     const [activeId, setActiveId] = useState<string | null>(null);
     const [activeType, setActiveType] = useState<"list" | "card" | null>(null);
 
+    useEventListener(({ event }) => {
+        if (event.type === "BOARD_UPDATED") {
+            router.refresh();
+        }
+    });
+
     const { execute: executeUpdateListOrder } = useAction(updateListOrder, {
         onSuccess: () => {
             toast.success("List reordered");
+            broadcast({ type: "BOARD_UPDATED" });
         },
         onError: (error) => {
             toast.error(error);
@@ -55,11 +74,13 @@ export const ListContainer = ({ boardId, lists }: ListContainerProps) => {
     const { execute: executeUpdateCardOrder } = useAction(updateCardOrder, {
         onSuccess: () => {
             toast.success("Card reordered");
+            broadcast({ type: "BOARD_UPDATED" });
         },
         onError: (error) => {
             toast.error(error);
         },
     });
+
 
     useEffect(() => {
         setOrderedData(lists);
@@ -83,7 +104,9 @@ export const ListContainer = ({ boardId, lists }: ListContainerProps) => {
 
         setActiveId(id);
         setActiveType(type);
+        updateMyPresence({ activeId: id });
     };
+
 
     const onDragOver = (event: DragOverEvent) => {
         const { active, over } = event;
@@ -297,7 +320,9 @@ export const ListContainer = ({ boardId, lists }: ListContainerProps) => {
 
         setActiveId(null);
         setActiveType(null);
+        updateMyPresence({ activeId: null });
     };
+
 
 
     const [isMounted, setIsMounted] = useState(false);

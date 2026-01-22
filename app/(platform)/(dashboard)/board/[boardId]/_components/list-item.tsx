@@ -7,8 +7,10 @@ import { CSS } from "@dnd-kit/utilities";
 
 import { cn } from "@/lib/utils";
 import { List, Card } from "@prisma/client";
+import { useOthers } from "@/lib/liveblocks";
 import { CardItem } from "./card-item";
 import { CardForm } from "./card-form";
+
 
 type ListWithCards = List & { cards: Card[] };
 
@@ -38,6 +40,10 @@ export const ListItem = ({ list, index }: ListItemProps) => {
         transition,
     };
 
+    const others = useOthers();
+    const draggingCollaborator = others.find((u) => u.presence.activeId === list.id);
+    const isBeingDraggedByOther = !!draggingCollaborator;
+
     return (
         <li
             ref={setNodeRef}
@@ -48,10 +54,15 @@ export const ListItem = ({ list, index }: ListItemProps) => {
                 {...attributes}
                 {...listeners}
                 className={cn(
-                    "w-full rounded-md bg-[#f1f2f4] shadow-md pb-2",
+                    "w-full rounded-md bg-[#f1f2f4] shadow-md pb-2 transition-shadow",
                     isDragging ? "opacity-50" : ""
                 )}
+                style={{
+                    boxShadow: isBeingDraggedByOther ? `0 0 0 2px white, 0 0 0 4px ${draggingCollaborator.info.color}` : undefined
+                }}
             >
+
+
                 <div className="pt-2 px-2 text-sm font-semibold flex justify-between items-start gap-x-2">
                     <div className="w-full text-sm px-2.5 py-1 h-7 font-medium border-transparent">
                         {list.title}

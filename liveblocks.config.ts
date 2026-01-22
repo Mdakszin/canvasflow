@@ -6,7 +6,10 @@ declare global {
     Presence: {
       // Real-time cursor coordinates (null when cursor is outside the board)
       cursor: { x: number; y: number } | null;
+      // The ID of the item (list or card) currently being dragged
+      activeId: string | null;
     };
+
 
     // The Storage tree for the room, for useMutation, useStorage, etc.
     // We use database for persistence, so this is empty

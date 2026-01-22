@@ -6,6 +6,8 @@ import { Card } from "@prisma/client";
 import { useCardModal } from "@/hooks/use-card-modal";
 
 import { cn } from "@/lib/utils"; // Assuming utils exists
+import { useOthers } from "@/lib/liveblocks";
+
 
 interface CardItemProps {
     card: Card;
@@ -35,19 +37,28 @@ export const CardItem = ({ card, index }: CardItemProps) => {
         transition,
     };
 
+    const others = useOthers();
+    const draggingCollaborator = others.find((u) => u.presence.activeId === card.id);
+    const isBeingDraggedByOther = !!draggingCollaborator;
+
     return (
         <div
             onClick={() => cardModal.onOpen(card.id)}
             ref={setNodeRef}
-            style={style}
+            style={{
+                ...style,
+                boxShadow: isBeingDraggedByOther ? `0 0 0 2px white, 0 0 0 4px ${draggingCollaborator.info.color}` : undefined
+            }}
             {...attributes}
             {...listeners}
             className={cn(
-                "truncate border-2 border-transparent hover:border-black py-2 px-3 text-sm bg-white rounded-md shadow-sm",
+                "truncate border-2 border-transparent hover:border-black py-2 px-3 text-sm bg-white rounded-md shadow-sm transition-shadow",
                 isDragging ? "opacity-50" : ""
             )}
             role="button"
         >
+
+
             {card.title}
         </div>
     );

@@ -12,7 +12,8 @@ export const Room = ({ roomId, children }: RoomProps) => {
     return (
         <LiveblocksRoomProvider
             id={roomId}
-            initialPresence={{ cursor: null }}
+            initialPresence={{ cursor: null, activeId: null }}
+
         >
             {children}
         </LiveblocksRoomProvider>
