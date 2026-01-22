@@ -222,7 +222,10 @@ export const ListContainer = ({ boardId, lists }: ListContainerProps) => {
             const newIndex = orderedData.findIndex((list) => list.id === overId);
 
             if (oldIndex !== -1 && newIndex !== -1) {
-                const newLists = arrayMove(orderedData, oldIndex, newIndex);
+                const newLists = arrayMove(orderedData, oldIndex, newIndex).map((item, index) => ({
+                    ...item,
+                    order: index,
+                }));
 
                 // Update local state
                 setOrderedData(newLists);
@@ -249,7 +252,11 @@ export const ListContainer = ({ boardId, lists }: ListContainerProps) => {
                     const newIndex = list.cards.findIndex((card) => card.id === overId);
 
                     if (oldIndex !== -1 && newIndex !== -1) {
-                        const newCards = arrayMove(list.cards, oldIndex, newIndex);
+                        const newCards = arrayMove(list.cards, oldIndex, newIndex).map((item, index) => ({
+                            ...item,
+                            order: index,
+                        }));
+
                         const newOrderedData = [...orderedData];
                         newOrderedData[activeListIndex] = { ...list, cards: newCards };
 
@@ -257,31 +264,75 @@ export const ListContainer = ({ boardId, lists }: ListContainerProps) => {
                         executeUpdateCardOrder({ items: newCards, boardId });
                     }
                 } else {
-                    // Different list, it should have been moved in onDragOver
-                    // If we somehow didn't update state in onDragOver correctly (unlikely with current implementation)
-                    // we'd handle it here, but since onDragOver updates state, we just need to finalize.
-                    const list = orderedData.find((list) => list.cards.some((card) => card.id === activeId));
-                    if (list) {
-                        setOrderedData(orderedData);
-                        executeUpdateCardOrder({ items: list.cards, boardId });
+                    // Different list, it was moved in onDragOver
+                    const destList = orderedData.find((list) => list.cards.some((card) => card.id === activeId));
+                    const sourceList = orderedData[activeListIndex];
+
+                    if (destList && sourceList) {
+                        const newDestCards = destList.cards.map((item, index) => ({
+                            ...item,
+                            order: index,
+                        }));
+
+                        const newSourceCards = sourceList.cards.map((item, index) => ({
+                            ...item,
+                            order: index,
+                        }));
+
+                        const newOrderedData = [...orderedData];
+                        const destListIndex = newOrderedData.findIndex((l) => l.id === destList.id);
+                        const sourceListIndex = newOrderedData.findIndex((l) => l.id === sourceList.id);
+
+                        newOrderedData[destListIndex] = { ...destList, cards: newDestCards };
+                        newOrderedData[sourceListIndex] = { ...sourceList, cards: newSourceCards };
+
+                        setOrderedData(newOrderedData);
+                        executeUpdateCardOrder({ items: newDestCards, boardId });
+                        executeUpdateCardOrder({ items: newSourceCards, boardId });
                     }
                 }
             }
         }
+
 
         setActiveId(null);
         setActiveType(null);
     };
 
 
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    if (!isMounted) {
+        return (
+            <div className="flex gap-x-3 h-full overflow-x-auto pb-4">
+                {orderedData.map((list, index) => (
+                    <ListItem
+                        key={list.id}
+                        index={index}
+                        list={list}
+                    />
+                ))}
+                <ListForm boardId={boardId} />
+                <div className="shrink-0 w-1" />
+
+            </div>
+        );
+    }
+
     return (
         <DndContext
+            id="board-context"
             sensors={sensors}
             collisionDetection={closestCorners}
             onDragStart={onDragStart}
             onDragOver={onDragOver}
             onDragEnd={onDragEnd}
         >
+
             <div className="flex gap-x-3 h-full overflow-x-auto pb-4">
                 <SortableContext items={orderedData.map(l => l.id)} strategy={horizontalListSortingStrategy}>
                     {orderedData.map((list, index) => (
@@ -293,7 +344,8 @@ export const ListContainer = ({ boardId, lists }: ListContainerProps) => {
                     ))}
                 </SortableContext>
                 <ListForm boardId={boardId} />
-                <div className="flex-shrink-0 w-1" />
+                <div className="shrink-0 w-1" />
+
             </div>
             <DragOverlay dropAnimation={{
                 sideEffects: defaultDropAnimationSideEffects({

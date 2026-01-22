@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useCardModal } from "@/hooks/use-card-modal";
 import { getCard } from "@/actions/get-card";
 import { Header } from "./header";
@@ -36,6 +36,12 @@ export const CardModal = () => {
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
+                <DialogTitle className="sr-only">
+                    {cardData?.title || "Card details"}
+                </DialogTitle>
+                <DialogDescription className="sr-only">
+                    Card details and activity
+                </DialogDescription>
                 {!cardData ? (
                     <div className="w-full h-full flex items-center justify-center p-6">
                         <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-neutral-600" />
