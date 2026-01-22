@@ -208,16 +208,9 @@ export const ListContainer = ({ boardId, lists }: ListContainerProps) => {
 
     const onDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
-        const id = active.id;
         const overId = over?.id;
 
-        if (!over) {
-            setActiveId(null);
-            setActiveType(null);
-            return;
-        }
-
-        if (activeId === overId) {
+        if (!over || activeId === overId) {
             setActiveId(null);
             setActiveType(null);
             return;
@@ -225,83 +218,61 @@ export const ListContainer = ({ boardId, lists }: ListContainerProps) => {
 
         // Dropping a List
         if (activeType === "list") {
-            setOrderedData((prev) => {
-                const oldIndex = prev.findIndex((list) => list.id === activeId);
-                const newIndex = prev.findIndex((list) => list.id === overId);
-                const newLists = arrayMove(prev, oldIndex, newIndex);
+            const oldIndex = orderedData.findIndex((list) => list.id === activeId);
+            const newIndex = orderedData.findIndex((list) => list.id === overId);
+
+            if (oldIndex !== -1 && newIndex !== -1) {
+                const newLists = arrayMove(orderedData, oldIndex, newIndex);
+
+                // Update local state
+                setOrderedData(newLists);
 
                 // Trigger Server Action
                 executeUpdateListOrder({ items: newLists, boardId });
-
-                return newLists;
-            });
+            }
         }
 
         // Dropping a Card
         if (activeType === "card") {
-            setOrderedData((prev) => {
-                const activeListIndex = prev.findIndex((list) =>
-                    list.cards.some((card) => card.id === activeId)
-                );
-                const overListIndex = prev.findIndex((list) =>
-                    list.cards.some((card) => card.id === overId)
-                );
+            const activeListIndex = orderedData.findIndex((list) =>
+                list.cards.some((card) => card.id === activeId)
+            );
+            const overListIndex = orderedData.findIndex((list) =>
+                list.cards.some((card) => card.id === overId)
+            );
 
-                // If same list, reorder
+            if (activeListIndex !== -1 && overListIndex !== -1) {
+                // Same list, reorder
                 if (activeListIndex === overListIndex) {
-                    const listIndex = activeListIndex;
-                    const list = prev[listIndex];
+                    const list = orderedData[activeListIndex];
                     const oldIndex = list.cards.findIndex((card) => card.id === activeId);
                     const newIndex = list.cards.findIndex((card) => card.id === overId);
 
-                    const newCards = arrayMove(list.cards, oldIndex, newIndex);
-                    const newList = { ...list, cards: newCards };
+                    if (oldIndex !== -1 && newIndex !== -1) {
+                        const newCards = arrayMove(list.cards, oldIndex, newIndex);
+                        const newOrderedData = [...orderedData];
+                        newOrderedData[activeListIndex] = { ...list, cards: newCards };
 
-                    const newOrderedData = [...prev];
-                    newOrderedData[listIndex] = newList;
-
-                    // Trigger Server Action
-                    executeUpdateCardOrder({ items: newCards, boardId });
-
-                    return newOrderedData;
+                        setOrderedData(newOrderedData);
+                        executeUpdateCardOrder({ items: newCards, boardId });
+                    }
+                } else {
+                    // Different list, it should have been moved in onDragOver
+                    // If we somehow didn't update state in onDragOver correctly (unlikely with current implementation)
+                    // we'd handle it here, but since onDragOver updates state, we just need to finalize.
+                    const list = orderedData.find((list) => list.cards.some((card) => card.id === activeId));
+                    if (list) {
+                        setOrderedData(orderedData);
+                        executeUpdateCardOrder({ items: list.cards, boardId });
+                    }
                 }
-
-                // If different list, handled in onDragOver mostly, but we need to finalize if needed?
-                // Usually dnd-kit advises handling move between containers in onDragOver and reorder in onDragEnd.
-                // Since we updated state in onDragOver, the card is already in the new list in state.
-                // So we just need to reorder in the new list if needed.
-                // But wait, if we moved it in onDragOver, now activeListIndex and overListIndex are SAME (the dest list).
-                const listIndex = prev.findIndex((list) => list.cards.some((card) => card.id === activeId));
-                const list = prev[listIndex];
-
-                const oldIndex = list.cards.findIndex((card) => card.id === activeId);
-                const newIndex = list.cards.findIndex((card) => card.id === overId);
-
-                if (oldIndex !== newIndex) {
-                    const newCards = arrayMove(list.cards, oldIndex, newIndex);
-                    const newOrderedData = [...prev];
-                    newOrderedData[listIndex] = { ...list, cards: newCards };
-
-                    executeUpdateCardOrder({ items: newCards, boardId });
-                    return newOrderedData;
-                }
-
-                // If indices are same (dropped in place in new list), we still need to save?
-                // We should trigger save whenever card listId changes too.
-                // So we should always trigger save here if we moved lists.
-
-                // However, detecting if we moved lists here is hard because state is already updated.
-                // We can rely on card.listId which we updated in onDragOver.
-
-                executeUpdateCardOrder({ items: list.cards, boardId });
-
-                return prev;
-            });
+            }
         }
 
         setActiveId(null);
         setActiveType(null);
     };
+
 
     return (
         <DndContext
