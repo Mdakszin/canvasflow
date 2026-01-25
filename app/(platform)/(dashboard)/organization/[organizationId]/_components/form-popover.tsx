@@ -18,11 +18,14 @@ import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
 import { FormPicker } from "@/components/form/form-picker";
 
+import { useProModal } from "@/hooks/use-pro-modal";
+
 interface FormPopoverProps {
     children: React.ReactNode;
     side?: "left" | "right" | "top" | "bottom";
     align?: "start" | "center" | "end";
     sideOffset?: number;
+    isPro?: boolean;
 }
 
 export const FormPopover = ({
@@ -30,7 +33,9 @@ export const FormPopover = ({
     side = "bottom",
     align,
     sideOffset = 0,
+    isPro,
 }: FormPopoverProps) => {
+    const proModal = useProModal();
     const router = useRouter();
     const closeRef = useRef<ElementRef<"button">>(null);
 
@@ -42,6 +47,9 @@ export const FormPopover = ({
         },
         onError: (error) => {
             toast.error(error);
+            if (!isPro && error.includes("limit")) {
+                proModal.onOpen();
+            }
         },
     });
 
