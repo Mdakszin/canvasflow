@@ -5,7 +5,9 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { ActionState } from "@/lib/create-safe-action";
-import { List } from "@prisma/client";
+import { List, ACTION, ENTITY_TYPE } from "@prisma/client";
+import { createAuditLog } from "@/lib/create-audit-log";
+
 
 const CreateListSchema = z.object({
   title: z.string().min(1, { message: "Title cannot be empty." }),
@@ -54,9 +56,17 @@ export async function createList(data: InputType): Promise<ReturnType> {
     list = await db.list.create({
       data: { title, boardId, order: newOrder },
     });
+
+    await createAuditLog({
+      entityId: list.id,
+      entityTitle: list.title,
+      entityType: ENTITY_TYPE.LIST,
+      action: ACTION.CREATE,
+    });
   } catch (error) {
     return { error: "Failed to create list." };
   }
+
 
   revalidatePath(`/board/${boardId}`);
   return { data: list };

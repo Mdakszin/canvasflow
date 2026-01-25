@@ -5,7 +5,9 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { ActionState } from "@/lib/create-safe-action";
-import { Card } from "@prisma/client";
+import { Card, ACTION, ENTITY_TYPE } from "@prisma/client";
+import { createAuditLog } from "@/lib/create-audit-log";
+
 
 const UpdateCardOrderSchema = z.object({
   items: z.array(
@@ -61,6 +63,13 @@ export async function updateCardOrder(data: InputType): Promise<ReturnType> {
     );
 
     updatedCards = await db.$transaction(transaction);
+
+    await createAuditLog({
+      entityId: boardId,
+      entityTitle: "Card Reordered",
+      entityType: ENTITY_TYPE.BOARD,
+      action: ACTION.UPDATE,
+    });
   } catch (error) {
     return {
       error: "Failed to reorder."
