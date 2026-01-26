@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { createSafeAction } from "@/lib/create-safe-action";
+import { checkSubscription } from "@/lib/subscription";
 
 import { InputType, ReturnType } from "./types";
 import { ProcessYocoPaymentSchema } from "./schema";
@@ -14,6 +15,14 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     if (!userId || !orgId) {
         return {
             error: "Unauthorized",
+        };
+    }
+
+    const isPro = await checkSubscription();
+
+    if (isPro) {
+        return {
+            error: "You are already a Pro member.",
         };
     }
 
