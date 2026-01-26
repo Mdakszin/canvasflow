@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CardWithList } from "@/types";
 import { useAction } from "@/hooks/use-action";
 import { updateCard } from "@/actions/update-card";
+import { useBroadcastEvent } from "@/lib/liveblocks";
 
 interface HeaderProps {
     data: CardWithList;
@@ -17,6 +18,7 @@ interface HeaderProps {
 
 export const Header = ({ data }: HeaderProps) => {
     const params = useParams();
+    const broadcast = useBroadcastEvent();
     const inputRef = useRef<ComponentRef<"input">>(null);
 
     const [title, setTitle] = useState(data.title);
@@ -25,6 +27,8 @@ export const Header = ({ data }: HeaderProps) => {
         onSuccess: (data) => {
             toast.success(`Renamed to "${data.title}"`);
             setTitle(data.title);
+            broadcast({ type: "CARD_UPDATED", cardId: data.id });
+            broadcast({ type: "BOARD_UPDATED" });
         },
         onError: (error) => {
             toast.error(error);

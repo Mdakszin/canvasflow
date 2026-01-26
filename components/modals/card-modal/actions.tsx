@@ -3,6 +3,7 @@
 import { Copy, Trash } from "lucide-react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
+import { useBroadcastEvent } from "@/lib/liveblocks";
 
 import { useAction } from "@/hooks/use-action";
 import { copyCard } from "@/actions/copy-card";
@@ -11,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardWithList } from "@/types";
 import { useCardModal } from "@/hooks/use-card-modal";
+import { AuditLog } from "@prisma/client";
 
 interface ActionsProps {
     data: CardWithList;
@@ -19,10 +21,12 @@ interface ActionsProps {
 export const Actions = ({ data }: ActionsProps) => {
     const params = useParams();
     const cardModal = useCardModal();
+    const broadcast = useBroadcastEvent();
 
     const { execute: executeCopy, isLoading: isLoadingCopy } = useAction(copyCard, {
         onSuccess: (data) => {
             toast.success(`Card "${data.title}" copied`);
+            broadcast({ type: "BOARD_UPDATED" });
             cardModal.onClose();
         },
         onError: (error) => {
@@ -33,6 +37,7 @@ export const Actions = ({ data }: ActionsProps) => {
     const { execute: executeDelete, isLoading: isLoadingDelete } = useAction(deleteCard, {
         onSuccess: (data) => {
             toast.success(`Card "${data.title}" deleted`);
+            broadcast({ type: "BOARD_UPDATED" });
             cardModal.onClose();
         },
         onError: (error) => {

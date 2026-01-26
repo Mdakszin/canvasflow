@@ -13,15 +13,19 @@ import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/form/form-input";
 import { updateChecklistItem } from "@/actions/update-checklist-item";
 import { deleteChecklistItem } from "@/actions/delete-checklist-item";
+import { useBroadcastEvent } from "@/lib/liveblocks";
 
 interface ChecklistItemProps {
     data: ChecklistItem;
+    cardId: string;
 }
 
 export const ChecklistItemComponent = ({
     data,
+    cardId,
 }: ChecklistItemProps) => {
     const params = useParams();
+    const broadcast = useBroadcastEvent();
     const [isEditing, setIsEditing] = useState(false);
     const [title, setTitle] = useState(data.title);
 
@@ -43,6 +47,7 @@ export const ChecklistItemComponent = ({
         onSuccess: (data) => {
             toast.success(`Renamed to "${data.title}"`);
             setTitle(data.title);
+            broadcast({ type: "CARD_UPDATED", cardId });
             disableEditing();
         },
         onError: (error) => {
@@ -53,6 +58,7 @@ export const ChecklistItemComponent = ({
     const { execute: executeDelete, isLoading: isDeleting } = useAction(deleteChecklistItem, {
         onSuccess: (data) => {
             toast.success(`Checklist item "${data.title}" deleted`);
+            broadcast({ type: "CARD_UPDATED", cardId });
         },
         onError: (error) => {
             toast.error(error);
@@ -78,6 +84,7 @@ export const ChecklistItemComponent = ({
             boardId: params.boardId as string,
             isCompleted: checked,
         });
+        broadcast({ type: "CARD_UPDATED", cardId });
     };
 
     const onDelete = () => {

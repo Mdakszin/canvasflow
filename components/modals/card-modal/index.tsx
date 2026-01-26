@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useCardModal } from "@/hooks/use-card-modal";
 import { getCard } from "@/actions/get-card";
-import { getDescription } from "@/actions/get-description";
 import { Header } from "./header";
 import { Description } from "./description";
 import { Checklist } from "./checklist";
@@ -13,27 +12,36 @@ import { Activity } from "./activity";
 import { CardWithList } from "@/types";
 import { AuditLog } from "@prisma/client";
 import { getActivity } from "@/actions/get-activity";
+import { useEventListener } from "@/lib/liveblocks";
 
 export const CardModal = () => {
     const { id, isOpen, onClose } = useCardModal();
     const [cardData, setCardData] = useState<CardWithList | null>(null);
     const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
 
+    const fetchData = async () => {
+        if (!id) return;
+        const [cardData, auditLogs] = await Promise.all([
+            getCard(id),
+            getActivity(id),
+        ]);
+        setCardData(cardData);
+        setAuditLogs(auditLogs);
+    };
+
     useEffect(() => {
         if (id) {
-            const fetchData = async () => {
-                const [cardData, auditLogs] = await Promise.all([
-                    getCard(id),
-                    getActivity(id),
-                ]);
-                setCardData(cardData);
-                setAuditLogs(auditLogs);
-            };
             fetchData();
         } else {
             setCardData(null);
         }
     }, [id, isOpen]);
+
+    useEventListener(({ event }) => {
+        if (event.type === "CARD_UPDATED" && event.cardId === id) {
+            fetchData();
+        }
+    });
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>

@@ -10,6 +10,7 @@ import { useAction } from "@/hooks/use-action";
 import { updateCard } from "@/actions/update-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardWithList } from "@/types";
+import { useBroadcastEvent } from "@/lib/liveblocks";
 import { FormTextarea } from "@/components/form/form-textarea";
 import { FormSubmit } from "@/components/form/form-submit";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ interface DescriptionProps {
 
 export const Description = ({ data }: DescriptionProps) => {
     const params = useParams();
+    const broadcast = useBroadcastEvent();
     const [isEditing, setIsEditing] = useState(false);
     const textareaRef = useRef<ComponentRef<"textarea">>(null);
     const formRef = useRef<ComponentRef<"form">>(null);
@@ -47,6 +49,7 @@ export const Description = ({ data }: DescriptionProps) => {
     const { execute, fieldErrors } = useAction(updateCard, {
         onSuccess: (data) => {
             toast.success(`Card "${data.title}" updated`);
+            broadcast({ type: "CARD_UPDATED", cardId: data.id });
             disableEditing();
         },
         onError: (error) => {

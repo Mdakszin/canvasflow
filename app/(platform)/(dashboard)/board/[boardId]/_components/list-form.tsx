@@ -10,12 +10,14 @@ import { Button } from "@/components/ui/button";
 import { useAction } from "@/hooks/use-action";
 import { createList } from "@/actions/create-list";
 import { toast } from "sonner";
+import { useBroadcastEvent } from "@/lib/liveblocks";
 
 interface ListFormProps {
     boardId: string;
 }
 
 export const ListForm = ({ boardId }: ListFormProps) => {
+    const broadcast = useBroadcastEvent();
     const formRef = useRef<ComponentRef<"form">>(null);
     const inputRef = useRef<ComponentRef<"input">>(null);
 
@@ -35,6 +37,7 @@ export const ListForm = ({ boardId }: ListFormProps) => {
     const { execute, fieldErrors } = useAction(createList, {
         onSuccess: () => {
             toast.success("List created");
+            broadcast({ type: "BOARD_UPDATED" });
             disableEditing();
         },
         onError: (error) => {

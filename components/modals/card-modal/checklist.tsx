@@ -35,7 +35,11 @@ export const Checklist = ({
                 </div>
                 <div className="space-y-1">
                     {items.map((item) => (
-                        <ChecklistItemComponent key={item.id} data={item} />
+                        <ChecklistItemComponent
+                            key={item.id}
+                            data={item}
+                            cardId={cardId}
+                        />
                     ))}
                     <ChecklistForm cardId={cardId} />
                 </div>

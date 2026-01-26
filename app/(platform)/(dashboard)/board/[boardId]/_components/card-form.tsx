@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useAction } from "@/hooks/use-action";
 import { createCard } from "@/actions/create-card";
 import { toast } from "sonner";
+import { useBroadcastEvent } from "@/lib/liveblocks";
 
 interface CardFormProps {
     listId: string;
@@ -18,6 +19,7 @@ interface CardFormProps {
 
 export const CardForm = forwardRef<HTMLTextAreaElement, CardFormProps>(
     ({ listId, boardId }, ref) => {
+        const broadcast = useBroadcastEvent();
         const formRef = useRef<ComponentRef<"form">>(null);
         const [isEditing, setIsEditing] = useState(false);
 
@@ -32,6 +34,7 @@ export const CardForm = forwardRef<HTMLTextAreaElement, CardFormProps>(
         const { execute, fieldErrors } = useAction(createCard, {
             onSuccess: () => {
                 toast.success("Card created");
+                broadcast({ type: "BOARD_UPDATED" });
                 disableEditing();
             },
             onError: (error) => {

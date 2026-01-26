@@ -16,10 +16,12 @@ interface FormInputProps {
     className?: string;
     defaultValue?: string;
     onBlur?: () => void;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
-    ({ id, label, type, placeholder, required, disabled, errors, className, defaultValue, onBlur }, ref) => {
+    ({ id, label, type, placeholder, required, disabled, errors, className, defaultValue, onBlur, onChange, onKeyDown }, ref) => {
         const { pending } = useFormStatus();
 
         return (
@@ -32,6 +34,8 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                     ) : null}
                     <Input
                         onBlur={onBlur}
+                        onChange={onChange}
+                        onKeyDown={onKeyDown}
                         defaultValue={defaultValue}
                         ref={ref}
                         required={required}

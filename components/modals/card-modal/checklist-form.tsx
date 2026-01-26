@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { FormTextarea } from "@/components/form/form-textarea";
 import { FormSubmit } from "@/components/form/form-submit";
 import { createChecklistItem } from "@/actions/create-checklist-item";
+import { useBroadcastEvent } from "@/lib/liveblocks";
 
 interface ChecklistFormProps {
     cardId: string;
@@ -20,6 +21,7 @@ export const ChecklistForm = ({
     cardId,
 }: ChecklistFormProps) => {
     const params = useParams();
+    const broadcast = useBroadcastEvent();
     const [isEditing, setIsEditing] = useState(false);
 
     const formRef = useRef<ComponentRef<"form">>(null);
@@ -36,18 +38,19 @@ export const ChecklistForm = ({
         setIsEditing(false);
     };
 
-    const onKeyDown = (e: KeyboardEvent) => {
+    const onKeyDown = (e: React.KeyboardEvent | KeyboardEvent) => {
         if (e.key === "Escape") {
             disableEditing();
         }
     };
 
     useEventListener("keydown", onKeyDown);
-    useOnClickOutside(formRef, disableEditing);
+    useOnClickOutside(formRef as any, disableEditing);
 
     const { execute, fieldErrors } = useAction(createChecklistItem, {
         onSuccess: (data) => {
             toast.success(`Checklist item "${data.title}" created`);
+            broadcast({ type: "CARD_UPDATED", cardId });
             disableEditing();
         },
         onError: (error) => {
@@ -71,7 +74,7 @@ export const ChecklistForm = ({
             >
                 <FormTextarea
                     id="title"
-                    onKeyDown={onKeyDown}
+                    onKeyDown={onKeyDown as any}
                     ref={textareaRef}
                     placeholder="Add an item..."
                     errors={fieldErrors}
