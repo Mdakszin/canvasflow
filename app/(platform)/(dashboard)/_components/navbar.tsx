@@ -12,7 +12,7 @@ export const Navbar = async () => {
     const availableCount = await getAvailableCount();
 
     return (
-        <nav className="fixed z-50 top-0 px-4 w-full h-14 border-b shadow-sm bg-white flex items-center">
+        <nav className="fixed z-50 top-0 px-4 w-full h-14 border-b border-neutral-200 bg-white/80 backdrop-blur-md flex items-center">
             <MobileSidebar
                 isPro={subscription.isPro}
                 availableCount={availableCount}

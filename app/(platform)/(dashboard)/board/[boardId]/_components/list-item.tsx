@@ -54,17 +54,15 @@ export const ListItem = ({ list, index }: ListItemProps) => {
                 {...attributes}
                 {...listeners}
                 className={cn(
-                    "w-full rounded-md bg-[#f1f2f4] shadow-md pb-2 transition-shadow",
+                    "w-full rounded-xl bg-neutral-100/60 border border-transparent transition-all",
                     isDragging ? "opacity-50" : ""
                 )}
                 style={{
                     boxShadow: isBeingDraggedByOther ? `0 0 0 2px white, 0 0 0 4px ${draggingCollaborator.info.color}` : undefined
                 }}
             >
-
-
-                <div className="pt-2 px-2 text-sm font-semibold flex justify-between items-start gap-x-2">
-                    <div className="w-full text-sm px-2.5 py-1 h-7 font-medium border-transparent">
+                <div className="pt-3 px-3 text-sm font-semibold flex justify-between items-start gap-x-2">
+                    <div className="w-full text-[13px] uppercase tracking-wider text-neutral-500 px-2.5 py-1">
                         {list.title}
                     </div>
                 </div>

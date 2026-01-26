@@ -116,8 +116,8 @@ export const ChecklistItemComponent = ({
                 <div
                     onClick={enableEditing}
                     className={cn(
-                        "flex-1 text-sm py-1.5 px-2 rounded-md hover:bg-neutral-100 cursor-pointer transition",
-                        data.isCompleted && "text-muted-foreground line-through decoration-neutral-500"
+                        "flex-1 text-sm py-1.5 px-2 rounded-lg hover:bg-neutral-50 cursor-pointer transition-colors font-medium text-neutral-700",
+                        data.isCompleted && "text-neutral-400 line-through decoration-neutral-300"
                     )}
                 >
                     {data.title}

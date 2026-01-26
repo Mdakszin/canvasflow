@@ -79,9 +79,9 @@ export const Sidebar = ({
     }
 
     return (
-        <>
-            <div className="font-medium text-xs flex items-center mb-1">
-                <span className="pl-4">
+        <div className="space-y-4 w-full">
+            <div className="font-semibold text-[11px] uppercase tracking-[0.05em] text-neutral-400 flex items-center mb-2 px-2">
+                <span>
                     Workspaces
                 </span>
                 <Button
@@ -89,11 +89,11 @@ export const Sidebar = ({
                     type="button"
                     size="icon"
                     variant="ghost"
-                    className="ml-auto"
+                    className="ml-auto h-6 w-6"
                 >
                     <Link href="/select-org">
                         <Plus
-                            className="h-4 w-4"
+                            className="h-3 w-3"
                         />
                     </Link>
                 </Button>
@@ -101,7 +101,7 @@ export const Sidebar = ({
             <Accordion
                 type="multiple"
                 defaultValue={defaultAccordionValue}
-                className="space-y-2"
+                className="space-y-1"
             >
                 {userMemberships.data.map(({ organization }) => (
                     <NavItem
@@ -120,6 +120,6 @@ export const Sidebar = ({
                     plan={plan}
                 />
             </div>
-        </>
+        </div>
     );
 };

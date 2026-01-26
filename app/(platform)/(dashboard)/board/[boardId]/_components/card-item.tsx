@@ -52,14 +52,16 @@ export const CardItem = ({ card, index }: CardItemProps) => {
             {...attributes}
             {...listeners}
             className={cn(
-                "truncate border-2 border-transparent hover:border-black py-2 px-3 text-sm bg-white rounded-md shadow-sm transition-shadow",
+                "milanote-card py-2.5 px-3 text-sm transition-all group relative cursor-pointer",
                 isDragging ? "opacity-50" : ""
             )}
             role="button"
         >
-
-
-            {card.title}
+            <div className="flex items-center gap-x-2">
+                <span className="flex-1 truncate font-medium text-neutral-800">
+                    {card.title}
+                </span>
+            </div>
         </div>
     );
 };
