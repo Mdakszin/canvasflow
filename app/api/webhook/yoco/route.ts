@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import crypto from "crypto";
 import { db } from "@/lib/db";
 
@@ -20,16 +21,12 @@ export async function POST(req: Request) {
             return new NextResponse("Server configuration error", { status: 500 });
         }
 
-        // Verify signature
-        // Construct expected signature with HMAC-SHA256
+        // Verify signature with HMAC-SHA256
         const expectedSignature = crypto
             .createHmac("sha256", secret)
             .update(body)
             .digest("hex");
 
-        // Split header by space or comma if it contains multiple parts
-        // Yoco signature format might be simple hash or "t=...,v1=..."
-        // We check if our expected signature exists in the header value
         const signatureParts = signature.split(/[, ]+/);
         const isValid = signatureParts.some(part => {
             return part === expectedSignature || part === `v1=${expectedSignature}`;
@@ -67,6 +64,10 @@ export async function POST(req: Request) {
                         currentPeriodEnd,
                     },
                 });
+
+                // Force cache invalidation
+                revalidatePath("/");
+                revalidatePath(`/organization/${orgId}`);
             }
         }
 
