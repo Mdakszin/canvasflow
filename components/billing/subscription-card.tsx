@@ -69,15 +69,36 @@ export const SubscriptionCard = ({
                 </div>
 
                 {isPro && currentPeriodEnd && (
-                    <div className="flex items-center justify-between py-3 border-b">
-                        <span className="text-sm text-muted-foreground flex items-center gap-x-2">
-                            <Calendar className="h-4 w-4" />
-                            Expires
-                        </span>
-                        <span className="text-sm font-medium">
-                            {format(new Date(currentPeriodEnd), "MMMM dd, yyyy")}
-                        </span>
-                    </div>
+                    <>
+                        <div className="flex items-center justify-between py-3 border-b">
+                            <span className="text-sm text-muted-foreground flex items-center gap-x-2">
+                                <Calendar className="h-4 w-4" />
+                                Expires
+                            </span>
+                            <span className="text-sm font-medium">
+                                {format(new Date(currentPeriodEnd), "MMMM dd, yyyy")}
+                            </span>
+                        </div>
+                        <div className="flex items-center justify-between py-3 border-b">
+                            <span className="text-sm text-muted-foreground">Remaining Time</span>
+                            <span className="text-sm font-medium text-sky-600">
+                                {(() => {
+                                    const now = new Date();
+                                    const end = new Date(currentPeriodEnd);
+                                    const diff = end.getTime() - now.getTime();
+                                    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+
+                                    if (days <= 0) return "Expiring soon";
+                                    if (days > 365) return "Over 1 year";
+
+                                    const months = Math.floor(days / 30);
+                                    const remainingDays = days % 30;
+
+                                    return `${months} months, ${remainingDays} days`;
+                                })()}
+                            </span>
+                        </div>
+                    </>
                 )}
 
                 {!isPro && (
