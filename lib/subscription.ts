@@ -24,7 +24,8 @@ export const checkSubscription = async () => {
 
     const isValid =
         orgSubscription.status === "active" &&
-        orgSubscription.currentPeriodEnd?.getTime()! + DAY_IN_MS > Date.now();
+        orgSubscription.currentPeriodEnd &&
+        orgSubscription.currentPeriodEnd.getTime() + DAY_IN_MS > Date.now();
 
     return !!isValid;
 };
@@ -68,7 +69,8 @@ export const getSubscriptionDetails = async (): Promise<SubscriptionDetails> => 
 
     const isValid =
         orgSubscription.status === "active" &&
-        orgSubscription.currentPeriodEnd?.getTime()! + DAY_IN_MS > Date.now();
+        orgSubscription.currentPeriodEnd &&
+        orgSubscription.currentPeriodEnd.getTime() + DAY_IN_MS > Date.now();
 
     return {
         isPro: !!isValid,
