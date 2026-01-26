@@ -41,9 +41,16 @@ export async function POST(req: Request) {
         const { type, payload } = event;
 
         if (type === "payment.succeeded") {
-            const { metadata, id } = payload;
-            const orgId = metadata?.orgId;
-            const planId = metadata?.planId || "pro";
+            const { metadata, id, checkoutId } = payload;
+
+            // Yoco might put metadata at top level or inside checkout
+            const effectiveMetadata = metadata || payload.checkout?.metadata;
+
+            const orgId = effectiveMetadata?.orgId;
+            const planId = effectiveMetadata?.planId || "pro";
+            const userId = effectiveMetadata?.userId;
+
+            console.log("Yoco Webhook Metadata processed:", { orgId, planId, userId, id, checkoutId });
 
             if (orgId) {
                 const currentPeriodEnd = new Date();
@@ -54,14 +61,14 @@ export async function POST(req: Request) {
                     update: {
                         status: "active",
                         planType: planId,
-                        externalId: id,
+                        externalId: checkoutId || id,
                         currentPeriodEnd,
                     },
                     create: {
                         orgId,
                         status: "active",
                         planType: planId,
-                        externalId: id,
+                        externalId: checkoutId || id,
                         currentPeriodEnd,
                     },
                 });
