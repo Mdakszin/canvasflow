@@ -28,3 +28,52 @@ export const checkSubscription = async () => {
 
     return !!isValid;
 };
+
+export interface SubscriptionDetails {
+    isPro: boolean;
+    status: string | null;
+    planType: string | null;
+    currentPeriodEnd: Date | null;
+}
+
+export const getSubscriptionDetails = async (): Promise<SubscriptionDetails> => {
+    const { orgId } = await auth();
+
+    if (!orgId) {
+        return {
+            isPro: false,
+            status: null,
+            planType: null,
+            currentPeriodEnd: null,
+        };
+    }
+
+    const orgSubscription = await db.orgSubscription.findUnique({
+        where: { orgId },
+        select: {
+            status: true,
+            planType: true,
+            currentPeriodEnd: true,
+        },
+    });
+
+    if (!orgSubscription) {
+        return {
+            isPro: false,
+            status: null,
+            planType: null,
+            currentPeriodEnd: null,
+        };
+    }
+
+    const isValid =
+        orgSubscription.status === "active" &&
+        orgSubscription.currentPeriodEnd?.getTime()! + DAY_IN_MS > Date.now();
+
+    return {
+        isPro: !!isValid,
+        status: orgSubscription.status,
+        planType: orgSubscription.planType,
+        currentPeriodEnd: orgSubscription.currentPeriodEnd,
+    };
+};

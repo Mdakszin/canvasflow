@@ -1,0 +1,107 @@
+"use client";
+
+import { format } from "date-fns";
+import { CreditCard, CheckCircle, XCircle, Calendar } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { useProModal } from "@/hooks/use-pro-modal";
+
+interface SubscriptionCardProps {
+    isPro: boolean;
+    status: string | null;
+    planType: string | null;
+    currentPeriodEnd: Date | null;
+}
+
+export const SubscriptionCard = ({
+    isPro,
+    status,
+    planType,
+    currentPeriodEnd,
+}: SubscriptionCardProps) => {
+    const proModal = useProModal();
+
+    return (
+        <div className="border rounded-lg p-6 bg-white shadow-sm">
+            <div className="flex items-center gap-x-4 mb-6">
+                <div className="p-3 rounded-full bg-sky-100">
+                    <CreditCard className="h-6 w-6 text-sky-600" />
+                </div>
+                <div>
+                    <h2 className="text-lg font-semibold">Subscription</h2>
+                    <p className="text-sm text-muted-foreground">
+                        Manage your subscription and billing
+                    </p>
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                <div className="flex items-center justify-between py-3 border-b">
+                    <span className="text-sm text-muted-foreground">Status</span>
+                    <div className="flex items-center gap-x-2">
+                        {isPro ? (
+                            <>
+                                <CheckCircle className="h-4 w-4 text-emerald-500" />
+                                <span className="text-sm font-medium text-emerald-600">Active</span>
+                            </>
+                        ) : (
+                            <>
+                                <XCircle className="h-4 w-4 text-rose-500" />
+                                <span className="text-sm font-medium text-rose-600">Inactive</span>
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex items-center justify-between py-3 border-b">
+                    <span className="text-sm text-muted-foreground">Plan</span>
+                    <span className="text-sm font-medium">
+                        {isPro ? (
+                            <span className="bg-gradient-to-r from-sky-500 to-cyan-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                                Pro
+                            </span>
+                        ) : (
+                            <span className="bg-neutral-100 text-neutral-600 px-3 py-1 rounded-full text-xs font-semibold">
+                                Free
+                            </span>
+                        )}
+                    </span>
+                </div>
+
+                {isPro && currentPeriodEnd && (
+                    <div className="flex items-center justify-between py-3 border-b">
+                        <span className="text-sm text-muted-foreground flex items-center gap-x-2">
+                            <Calendar className="h-4 w-4" />
+                            Expires
+                        </span>
+                        <span className="text-sm font-medium">
+                            {format(new Date(currentPeriodEnd), "MMMM dd, yyyy")}
+                        </span>
+                    </div>
+                )}
+
+                {!isPro && (
+                    <div className="pt-4">
+                        <Button
+                            onClick={proModal.onOpen}
+                            className="w-full bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600"
+                        >
+                            Upgrade to Pro
+                        </Button>
+                        <p className="text-xs text-center text-muted-foreground mt-2">
+                            Unlock unlimited boards and premium features
+                        </p>
+                    </div>
+                )}
+
+                {isPro && (
+                    <div className="pt-4 text-center">
+                        <p className="text-sm text-emerald-600 font-medium">
+                            🎉 You have full access to all Pro features!
+                        </p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
