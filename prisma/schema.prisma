@@ -52,8 +52,26 @@ model Card {
   order     Float
   list      List     @relation(fields: [listId], references: [id], onDelete: Cascade)
   listId    String
+
+  checklist ChecklistItem[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ChecklistItem {
+  id          String   @id @default(cuid())
+  title       String
+  isCompleted Boolean  @default(false)
+  order       Int
+
+  card        Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  cardId      String
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([cardId])
 }
 
 enum ACTION {
@@ -66,6 +84,7 @@ enum ENTITY_TYPE {
   BOARD
   LIST
   CARD
+  CHECKLIST_ITEM
 }
 
 model AuditLog {

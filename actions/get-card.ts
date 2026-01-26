@@ -2,11 +2,9 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { Card, List } from "@prisma/client";
+import { CardWithList } from "@/types";
 
-type ReturnType = (Card & { list: { title: string } }) | null;
-
-export const getCard = async (id: string): Promise<ReturnType> => {
+export const getCard = async (id: string): Promise<CardWithList | null> => {
     const { orgId } = await auth();
 
     if (!orgId) {
@@ -28,8 +26,13 @@ export const getCard = async (id: string): Promise<ReturnType> => {
                     title: true,
                 },
             },
+            checklist: {
+                orderBy: {
+                    order: "asc",
+                },
+            },
         },
     });
 
-    return card;
+    return card as CardWithList;
 };

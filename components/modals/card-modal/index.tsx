@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useCardModal } from "@/hooks/use-card-modal";
 import { getCard } from "@/actions/get-card";
+import { getDescription } from "@/actions/get-description";
 import { Header } from "./header";
 import { Description } from "./description";
+import { Checklist } from "./checklist";
 import { Actions } from "./actions";
 import { Activity } from "./activity";
 import { CardWithList } from "@/types";
@@ -53,6 +55,7 @@ export const CardModal = () => {
                             <div className="col-span-3">
                                 <div className="w-full space-y-6">
                                     <Description data={cardData} />
+                                    <Checklist cardId={cardData.id} items={cardData.checklist} />
                                     <Activity items={auditLogs} />
                                 </div>
                             </div>
