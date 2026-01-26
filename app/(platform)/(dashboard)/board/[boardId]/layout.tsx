@@ -4,6 +4,7 @@ import { redirect, notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { BoardNavbar } from "./_components/board-navbar";
 import { Room } from "@/components/providers/room-provider";
+import { CardModal } from "@/components/modals/card-modal";
 
 export async function generateMetadata({
     params,
@@ -58,6 +59,7 @@ export default async function BoardIdLayout({
 
     return (
         <Room roomId={boardId}>
+            <CardModal />
             <div
                 className="relative h-full bg-no-repeat bg-cover bg-center"
                 style={{ backgroundImage: `url(${board.imageFullUrl})` }}
