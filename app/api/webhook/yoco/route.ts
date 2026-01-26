@@ -78,3 +78,8 @@ export async function POST(req: Request) {
         return new NextResponse("Webhook handler failed", { status: 500 });
     }
 }
+
+// GET handler for webhook verification (some providers ping this to verify the endpoint)
+export async function GET() {
+    return new NextResponse("Webhook endpoint is active", { status: 200 });
+}
