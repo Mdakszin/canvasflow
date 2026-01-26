@@ -2,13 +2,22 @@ import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 
+import { getSubscriptionDetails } from "@/lib/subscription";
+import { getAvailableCount } from "@/lib/org-limit";
 import { MobileSidebar } from "./mobile-sidebar";
 import { Logo } from "@/components/logo";
 
-export const Navbar = () => {
+export const Navbar = async () => {
+    const subscription = await getSubscriptionDetails();
+    const availableCount = await getAvailableCount();
+
     return (
         <nav className="fixed z-50 top-0 px-4 w-full h-14 border-b shadow-sm bg-white flex items-center">
-            <MobileSidebar />
+            <MobileSidebar
+                isPro={subscription.isPro}
+                availableCount={availableCount}
+                plan={subscription.plan}
+            />
             <div className="flex items-center gap-x-4">
                 <div className="hidden md:flex">
                     <Logo />

@@ -1,3 +1,5 @@
 import { z } from "zod";
 
-export const ProcessYocoPaymentSchema = z.object({});
+export const ProcessYocoPaymentSchema = z.object({
+    planId: z.string().optional(),
+});

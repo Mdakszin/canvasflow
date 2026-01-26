@@ -1,4 +1,4 @@
-import { checkSubscription } from "@/lib/subscription";
+import { getSubscriptionDetails } from "@/lib/subscription";
 import { getAvailableCount } from "@/lib/org-limit";
 import { Sidebar } from "../_components/sidebar";
 
@@ -7,7 +7,7 @@ export default async function OrganizationLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const isPro = await checkSubscription();
+    const subscription = await getSubscriptionDetails();
     const availableCount = await getAvailableCount();
 
     return (
@@ -15,8 +15,9 @@ export default async function OrganizationLayout({
             <div className="flex gap-x-7">
                 <div className="w-64 shrink-0 hidden md:block">
                     <Sidebar
-                        isPro={isPro}
+                        isPro={subscription.isPro}
                         availableCount={availableCount}
+                        plan={subscription.plan}
                     />
                 </div>
                 {children}

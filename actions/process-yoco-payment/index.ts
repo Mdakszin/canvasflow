@@ -4,7 +4,8 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { createSafeAction } from "@/lib/create-safe-action";
-import { checkSubscription } from "@/lib/subscription";
+import { getSubscriptionDetails } from "@/lib/subscription";
+import { PLANS, PlanId } from "@/constants/tiers";
 
 import { InputType, ReturnType } from "./types";
 import { ProcessYocoPaymentSchema } from "./schema";
@@ -18,11 +19,17 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         };
     }
 
-    const isPro = await checkSubscription();
+    const { planId: requestedPlanId = "pro" } = data;
+    const planToBuy = PLANS[requestedPlanId as PlanId] || PLANS.pro;
 
-    if (isPro) {
+    const { plan: currentPlan, isPro } = await getSubscriptionDetails();
+
+    // Prevent downgrades or duplicate same-tier purchases for now
+    // Pro is higher than Basic, which is higher than Free
+    const tierPriority = { free: 0, basic: 1, pro: 2 };
+    if (isPro && tierPriority[currentPlan.id] >= tierPriority[planToBuy.id]) {
         return {
-            error: "You are already a Pro member.",
+            error: `You already have an active ${currentPlan.name} subscription or higher.`,
         };
     }
 
@@ -34,14 +41,15 @@ const handler = async (data: InputType): Promise<ReturnType> => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                amount: 20000, // R200.00
+                amount: planToBuy.price,
                 currency: "ZAR",
                 successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/organization/${orgId}?payment=success`,
                 cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/organization/${orgId}?payment=cancelled`,
                 failureUrl: `${process.env.NEXT_PUBLIC_APP_URL}/organization/${orgId}?payment=failed`,
                 metadata: {
                     orgId,
-                    userId
+                    userId,
+                    planId: planToBuy.id,
                 }
             }),
         });

@@ -5,18 +5,19 @@ import { CreditCard, CheckCircle, XCircle, Calendar } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useProModal } from "@/hooks/use-pro-modal";
+import { Plan } from "@/constants/tiers";
 
 interface SubscriptionCardProps {
     isPro: boolean;
     status: string | null;
-    planType: string | null;
+    plan: Plan;
     currentPeriodEnd: Date | null;
 }
 
 export const SubscriptionCard = ({
     isPro,
     status,
-    planType,
+    plan,
     currentPeriodEnd,
 }: SubscriptionCardProps) => {
     const proModal = useProModal();
@@ -57,15 +58,27 @@ export const SubscriptionCard = ({
                     <span className="text-sm text-muted-foreground">Plan</span>
                     <span className="text-sm font-medium">
                         {isPro ? (
-                            <span className="bg-gradient-to-r from-sky-500 to-cyan-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                                Pro
+                            <span className="bg-gradient-to-r from-sky-500 to-cyan-500 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase">
+                                {plan.name}
                             </span>
                         ) : (
-                            <span className="bg-neutral-100 text-neutral-600 px-3 py-1 rounded-full text-xs font-semibold">
+                            <span className="bg-neutral-100 text-neutral-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase">
                                 Free
                             </span>
                         )}
                     </span>
+                </div>
+
+                <div className="py-3 border-b">
+                    <span className="text-sm text-muted-foreground block mb-2">Included Features</span>
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {plan.features.map((feature) => (
+                            <li key={feature} className="flex items-center gap-x-2 text-xs text-neutral-600">
+                                <CheckCircle className="h-3 w-3 text-emerald-500 shrink-0" />
+                                {feature}
+                            </li>
+                        ))}
+                    </ul>
                 </div>
 
                 {isPro && currentPeriodEnd && (

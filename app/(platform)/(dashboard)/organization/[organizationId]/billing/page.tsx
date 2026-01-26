@@ -15,7 +15,7 @@ const BillingPage = async () => {
             <SubscriptionCard
                 isPro={subscription.isPro}
                 status={subscription.status}
-                planType={subscription.planType}
+                plan={subscription.plan}
                 currentPeriodEnd={subscription.currentPeriodEnd}
             />
         </div>

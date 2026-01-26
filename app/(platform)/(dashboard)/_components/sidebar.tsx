@@ -12,17 +12,20 @@ import { Accordion } from "@/components/ui/accordion";
 import { AvailableCount } from "@/components/available-count";
 
 import { NavItem, Organization } from "./nav-item";
+import { Plan } from "@/constants/tiers";
 
 interface SidebarProps {
     storageKey?: string;
     isPro?: boolean;
     availableCount?: number;
+    plan: Plan;
 };
 
 export const Sidebar = ({
     storageKey = "t-sidebar-state",
     isPro = false,
     availableCount = 0,
+    plan,
 }: SidebarProps) => {
     const [expanded, setExpanded] = useLocalStorage<Record<string, any>>(
         storageKey,
@@ -114,6 +117,7 @@ export const Sidebar = ({
                 <AvailableCount
                     isPro={isPro}
                     availableCount={availableCount}
+                    plan={plan}
                 />
             </div>
         </>

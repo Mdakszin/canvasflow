@@ -44,7 +44,7 @@ export const decrementAvailableCount = async () => {
     }
 };
 
-export const hasAvailableCount = async () => {
+export const hasAvailableCount = async (limit: number = MAX_FREE_BOARDS) => {
     const { orgId } = await auth();
 
     if (!orgId) {
@@ -55,7 +55,7 @@ export const hasAvailableCount = async () => {
         where: { orgId }
     });
 
-    if (!orgLimit || orgLimit.count < MAX_FREE_BOARDS) {
+    if (!orgLimit || orgLimit.count < limit) {
         return true;
     } else {
         return false;

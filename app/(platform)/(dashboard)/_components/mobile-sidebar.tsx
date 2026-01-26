@@ -7,8 +7,19 @@ import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Sidebar } from "./sidebar";
+import { Plan } from "@/constants/tiers";
 
-export const MobileSidebar = () => {
+interface MobileSidebarProps {
+    isPro: boolean;
+    availableCount: number;
+    plan: Plan;
+}
+
+export const MobileSidebar = ({
+    isPro,
+    availableCount,
+    plan,
+}: MobileSidebarProps) => {
     const pathname = usePathname();
     const [isMounted, setIsMounted] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
@@ -42,7 +53,12 @@ export const MobileSidebar = () => {
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
                 <SheetContent side="left" className="p-2 pt-10">
                     <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                    <Sidebar storageKey="t-sidebar-mobile-state" />
+                    <Sidebar
+                        storageKey="t-sidebar-mobile-state"
+                        isPro={isPro}
+                        availableCount={availableCount}
+                        plan={plan}
+                    />
                 </SheetContent>
             </Sheet>
         </>

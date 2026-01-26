@@ -11,7 +11,7 @@ import {
     incrementAvailableCount,
     hasAvailableCount
 } from "@/lib/org-limit";
-import { checkSubscription } from "@/lib/subscription";
+import { getSubscriptionDetails } from "@/lib/subscription";
 
 import { InputType, ReturnType } from "./types";
 import { CreateBoardSchema } from "./schema";
@@ -25,12 +25,12 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         };
     }
 
-    const isPro = await checkSubscription();
-    const canCreate = await hasAvailableCount();
+    const { isPro, plan } = await getSubscriptionDetails();
+    const canCreate = await hasAvailableCount(plan.boardLimit);
 
-    if (!isPro && !canCreate) {
+    if (!canCreate) {
         return {
-            error: "You have reached your limit of free boards. Please upgrade to create more."
+            error: `You have reached your limit of ${plan.boardLimit} boards for the ${plan.name} plan. Please upgrade to create more.`
         };
     }
 

@@ -43,6 +43,7 @@ export async function POST(req: Request) {
         if (type === "payment.succeeded") {
             const { metadata, id } = payload;
             const orgId = metadata?.orgId;
+            const planId = metadata?.planId || "pro";
 
             if (orgId) {
                 const currentPeriodEnd = new Date();
@@ -52,14 +53,14 @@ export async function POST(req: Request) {
                     where: { orgId },
                     update: {
                         status: "active",
-                        planType: "pro",
+                        planType: planId,
                         externalId: id,
                         currentPeriodEnd,
                     },
                     create: {
                         orgId,
                         status: "active",
-                        planType: "pro",
+                        planType: planId,
                         externalId: id,
                         currentPeriodEnd,
                     },
