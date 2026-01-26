@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, ElementRef, forwardRef } from "react";
+import { useState, useRef, ComponentRef, forwardRef } from "react";
 import { Plus, X } from "lucide-react";
 import { useEventListener, useOnClickOutside } from "usehooks-ts";
 
@@ -18,7 +18,7 @@ interface CardFormProps {
 
 export const CardForm = forwardRef<HTMLTextAreaElement, CardFormProps>(
     ({ listId, boardId }, ref) => {
-        const formRef = useRef<ElementRef<"form">>(null);
+        const formRef = useRef<ComponentRef<"form">>(null);
         const [isEditing, setIsEditing] = useState(false);
 
         const enableEditing = () => {

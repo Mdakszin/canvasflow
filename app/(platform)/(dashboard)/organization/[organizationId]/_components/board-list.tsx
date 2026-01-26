@@ -1,12 +1,12 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { User2 } from "lucide-react";
-import Link from "next/link"; // Ensure Link is imported
+import Link from "next/link";
 
-import { db } from "@/lib/db"; // Use the singleton
+import { db } from "@/lib/db";
 import { FormPopover } from "./form-popover";
 import { Board } from "@prisma/client";
-import { MAX_FREE_BOARDS, getAvailableCount } from "@/lib/org-limit";
+import { getAvailableCount } from "@/lib/org-limit";
 import { checkSubscription } from "@/lib/subscription";
 
 export const BoardList = async () => {
@@ -55,7 +55,7 @@ export const BoardList = async () => {
                     >
                         <p className="text-sm">Create new board</p>
                         <span className="text-xs">
-                            {isPro ? "Unlimited" : `${MAX_FREE_BOARDS - availableCount} remaining`}
+                            {isPro ? "Unlimited" : `${5 - availableCount} remaining`}
                         </span>
                     </div>
                 </FormPopover>

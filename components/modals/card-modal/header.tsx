@@ -1,6 +1,6 @@
 "use client";
 
-import { ElementRef, useRef, useState } from "react";
+import { ComponentRef, useRef, useState } from "react";
 import { Layout } from "lucide-react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
@@ -17,7 +17,7 @@ interface HeaderProps {
 
 export const Header = ({ data }: HeaderProps) => {
     const params = useParams();
-    const inputRef = useRef<ElementRef<"input">>(null);
+    const inputRef = useRef<ComponentRef<"input">>(null);
 
     const [title, setTitle] = useState(data.title);
 

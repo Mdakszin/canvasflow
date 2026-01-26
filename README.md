@@ -27,9 +27,9 @@ A powerful, collaborative project management application inspired by Trello, bui
 
 ## Upcoming Features
 
-- 💳 **Subscriptions** - Stripe integration for Pro plans (Unlimited boards)
-- 📊 **Rate Limiting** - Usage limits for free tier users
-- 🌐 **Landing Page** - Comprehensive marketing landing page
+- 💳 **Subscriptions** - [Yoco](https://www.yoco.com/) integration for Pro plans (Unlimited boards)
+- 📊 **Usage Limits** - Board creation limits for free tier users
+- 🌐 **Landing Page** - Modern marketing landing page
 - 🚀 **Deployment** - Production deployment optimization
 
 ## Getting Started

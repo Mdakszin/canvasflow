@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, ElementRef } from "react";
+import { useState, useRef, ComponentRef } from "react";
 import { AlignLeft } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEventListener, useOnClickOutside } from "usehooks-ts";
@@ -21,8 +21,8 @@ interface DescriptionProps {
 export const Description = ({ data }: DescriptionProps) => {
     const params = useParams();
     const [isEditing, setIsEditing] = useState(false);
-    const textareaRef = useRef<ElementRef<"textarea">>(null);
-    const formRef = useRef<ElementRef<"form">>(null);
+    const textareaRef = useRef<ComponentRef<"textarea">>(null);
+    const formRef = useRef<ComponentRef<"form">>(null);
 
     const enableEditing = () => {
         setIsEditing(true);

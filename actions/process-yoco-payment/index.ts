@@ -17,60 +17,50 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         };
     }
 
-    const { token, amountInCents } = data;
-
     try {
-        const response = await fetch("https://online.yoco.africa/v1/charges/", {
+        const response = await fetch("https://payments.yoco.com/api/checkouts", {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${process.env.YOCO_SECRET_KEY}`,
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                token,
-                amountInCents,
+                amount: 20000, // R200.00
                 currency: "ZAR",
+                successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/organization/${orgId}?payment=success`,
+                cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/organization/${orgId}?payment=cancelled`,
+                failureUrl: `${process.env.NEXT_PUBLIC_APP_URL}/organization/${orgId}?payment=failed`,
+                metadata: {
+                    orgId,
+                    userId
+                }
             }),
         });
 
-        const result = await response.json();
+        let result;
+        try {
+            result = await response.json();
+        } catch (jsonError) {
+            console.error("Yoco API returned non-JSON response");
+            result = { message: "Invalid response from payment provider" };
+        }
 
-        if (!response.ok || result.status !== "successful") {
-            console.error("Yoco Error:", result);
+        if (!response.ok) {
+            console.error("Yoco Checkout Error - Status:", response.status);
+            console.error("Yoco Checkout Error - Body:", result);
             return {
-                error: "Payment failed. Please try again or contact support."
+                error: "Failed to create payment session: " + (result.errorMessage || result.message || "Unknown error")
             };
         }
 
-        // Update subscription in database
-        const currentPeriodEnd = new Date();
-        currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + 1);
-
-        await db.orgSubscription.upsert({
-            where: { orgId },
-            update: {
-                status: "active",
-                planType: "pro",
-                externalId: result.id,
-                currentPeriodEnd,
-            },
-            create: {
-                orgId,
-                status: "active",
-                planType: "pro",
-                externalId: result.id,
-                currentPeriodEnd,
-            },
-        });
+        console.log("Yoco Checkout Success:", result);
+        return { data: { redirectUrl: result.redirectUrl } };
 
     } catch (error) {
         return {
-            error: "An error occurred while processing your payment."
+            error: "An error occurred while creating the payment session."
         }
     }
-
-    revalidatePath(`/organization/${orgId}`);
-    return { data: { success: true } };
 };
 
 export const processYocoPayment = createSafeAction(ProcessYocoPaymentSchema, handler);

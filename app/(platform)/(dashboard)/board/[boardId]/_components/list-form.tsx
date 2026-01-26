@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, ElementRef } from "react";
+import { useState, useRef, ComponentRef } from "react";
 import { Plus, X } from "lucide-react";
 import { useEventListener, useOnClickOutside } from "usehooks-ts";
 
@@ -16,8 +16,8 @@ interface ListFormProps {
 }
 
 export const ListForm = ({ boardId }: ListFormProps) => {
-    const formRef = useRef<ElementRef<"form">>(null);
-    const inputRef = useRef<ElementRef<"input">>(null);
+    const formRef = useRef<ComponentRef<"form">>(null);
+    const inputRef = useRef<ComponentRef<"input">>(null);
 
     const [isEditing, setIsEditing] = useState(false);
 

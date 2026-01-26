@@ -1,4 +1,5 @@
 import { Navbar } from "./_components/navbar";
+import { OrgControl } from "@/components/org-control";
 
 export default function DashboardLayout({
     children,
@@ -7,6 +8,7 @@ export default function DashboardLayout({
 }) {
     return (
         <div className="h-full">
+            <OrgControl />
             <Navbar />
             {children}
         </div>
